@@ -1,0 +1,10 @@
+.main-sidebar .sidebar {
+	padding-top:5px;
+}
+.sidebar-menu li a.active {
+	background-color: #161e21;
+}
+
+table#servers .devicon-debian-plain {
+	color: #00A65A;
+}

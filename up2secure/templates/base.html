@@ -17,7 +17,7 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="{% static 'css/AdminLTE.min.css' %}">
   <!-- Skin -->
-  <link rel="stylesheet" href="{% static 'css/skin-green-light.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/skin-green.min.css' %}">
   <!-- Date Picker -->
   <link rel="stylesheet" href="{% static 'css/bootstrap-datepicker.min.css' %}">
   <!-- Daterange picker -->
@@ -35,11 +35,146 @@
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 
+  {% block extendhead %}{% endblock extendhead %}
+
+  <link rel="stylesheet" href="{% static 'overtone.css' %}">
 </head>
-<body class="hold-transition skin-blue sidebar-mini">
+<body class="hold-transition skin-green sidebar-mini">
 
 <div class="wrapper">
-	{% block content %}{% endblock content %}
+
+  <header class="main-header">
+    <!-- Logo -->
+    <a href="index2.html" class="logo">
+      <span class="logo-mini"><b>U2S</b></span>
+      <span class="logo-lg"><b>Up2Secure</b></span>
+    </a>
+    <nav class="navbar navbar-static-top">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+          <li class="dropdown messages-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="fa fa-envelope-o"></i>
+              <span class="label label-warning">1</span>
+            </a>
+            <ul class="dropdown-menu">
+              <li class="header">You have 1 messages</li>
+              <li>
+                <!-- inner menu: contains the actual data -->
+                <ul class="menu">
+
+                  <!-- start message -->
+                  <li>
+                    <a href="#">
+                      <div class="pull-left">
+                        <img src="{% static 'gfx/user-160x160.png' %}" class="img-circle" alt="User Image">
+                      </div>
+                      <h4>
+                        Support Team
+                        <small><i class="fa fa-clock-o"></i> 5 mins</small>
+                      </h4>
+                      <p>Thanks for using Up2Secure!</p>
+                    </a>
+                  </li>
+                  <!-- end message -->
+
+                </ul>
+              </li>
+              <li class="footer"><a href="#">See All Messages</a></li>
+            </ul>
+          </li>
+          <!-- User Account: style can be found in dropdown.less -->
+          <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <img src="{% static 'gfx/user-160x160.png' %}" class="user-image" alt="User Image">
+              <span class="hidden-xs">Username</span>
+            </a>
+            <ul class="dropdown-menu">
+              <!-- User image -->
+              <li class="user-header">
+                <img src="{% static 'gfx/user-160x160.png' %}" class="img-circle" alt="User Image">
+                <p>
+                  <strong>Username</strong><br />
+                  <i>thisisemail@address.com</i>
+                </p>
+              </li>
+              <!-- Menu Footer-->
+              <li class="user-footer">
+                <div class="pull-left">
+                  <a href="#" class="btn btn-info btn-flat">Profile</a>
+                </div>
+                <div class="pull-right">
+                  <a href="#" class="btn btn-danger btn-flat">Sign out</a>
+                </div>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <aside class="main-sidebar">
+    <section class="sidebar">
+      <div class="user-panel">
+        <div class="pull-left image">
+          <img src="{% static 'gfx/user-160x160.png' %}" class="img-circle" alt="User Image">
+        </div>
+        <div class="pull-left info">
+          <p>Username</p>
+          <a href="#"> Credits: 1000</a>
+        </div>
+      </div>
+
+      <ul class="sidebar-menu" data-widget="tree">
+
+        <li>
+          <a class="{% block menu_homepage %}{% endblock %}" href="{% url 'home' %}">
+            <i class="fa fa-home"></i> <span>Homepage</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="{% block menu_servers %}{% endblock %}" href="{% url 'servers' %}">
+            <i class="fa fa-server"></i> <span>Servers</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="{% block menu_updates %}{% endblock %}" href="{% url 'updates' %}">
+            <i class="fa fa-refresh"></i> <span>Updates</span>
+          </a>
+        </li>
+
+        <li>
+          <a class="{% block menu_accounting %}{% endblock %}" href="{% url 'accounting' %}">
+            <i class="fa fa-usd"></i> <span>Accounting</span>
+          </a>
+        </li>
+
+      </ul>
+    </section>
+  </aside>
+
+  <div class="content-wrapper">
+    <section class="content">
+		{% block content %}{% endblock content %}
+    </section>
+  </div>
+
+  <footer class="main-footer">
+    <div class="pull-right hidden-xs">
+    </div>
+    <strong>Copyright &copy; 2017 <a href="https://nuidi.com">Radosław Przytuła</a>.</strong> All rights
+    reserved.
+  </footer>
+
+</div>
+
 </div>
 
 <!-- jQuery 3 -->
@@ -75,6 +210,8 @@
 <script src="{% static 'js/fastclick.js' %}"></script>
 <!-- AdminLTE App -->
 <script src="{% static 'js/adminlte.min.js' %}"></script>
+
+{% block extendfoot %}{% endblock extendfoot %}
 
 </body>
 </html>
