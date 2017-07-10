@@ -40,7 +40,10 @@ DEFAULT_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'userland'
+    'userland',
+    'server',
+    'customer',
+    'reseller'
 ]
 
 

@@ -8,3 +8,7 @@
 table#servers .devicon-debian-plain {
 	color: #3c8dbc;
 }
+
+.navbar-nav>.user-menu>.dropdown-menu>li.user-header {
+	height: auto;
+}

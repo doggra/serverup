@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+{% block menu_homepage %}active{% endblock %}
+
+{% block contentheader %}
+    <h1>
+      Dashboard
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+    </ol>
+{% endblock contentheader %}
+
+{% block content %}
+  <div class="row">
+
+    <!-- SERVERS BOX -->
+    <div class="col-lg-4 col-xs-6">
+      <div class="small-box bg-primary">
+        <div class="inner">
+          <h3>0</h3>
+          <p>Servers</p>
+        </div>
+        <div class="icon">
+          <i class="fa fa-server"></i>
+        </div>
+        <a href="{% url 'server_list' %}" class="small-box-footer">Show&nbsp;&nbsp;<i class="fa fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
+    <!-- SERVERS BOX END -->
+
+    <!-- RESELLERS BOX -->
+    <div class="col-lg-4 col-xs-6">
+      <div class="small-box bg-green">
+        <div class="inner">
+          <h3>0</h3>
+          <p>Resellers</p>
+        </div>
+        <div class="icon">
+          <i class="fa fa-handshake-o"></i>
+        </div>
+        <a href="{% url 'reseller_list' %}" class="small-box-footer">Show&nbsp;&nbsp;<i class="fa fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
+    <!-- RESELLERS BOX END -->
+
+    <!-- CUSTOMERS BOX -->
+    <div class="col-lg-4 col-xs-6">
+      <div class="small-box bg-info">
+        <div class="inner">
+          <h3>0</h3>
+          <p>Customers</p>
+        </div>
+        <div class="icon">
+          <i class="fa fa-user-circle-o"></i>
+        </div>
+        <a href="{% url 'customer_list' %}" class="small-box-footer">Show&nbsp;&nbsp;<i class="fa fa-arrow-circle-right"></i></a>
+      </div>
+    </div>
+    <!-- CUSTOMERS BOX END -->
+
+  </div>
+{% endblock content %}
+
+{% block extendfoot %}{% endblock extendfoot %}

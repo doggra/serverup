@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block menu_server %}active{% endblock %}
+
+{% block extendhead %}
+<link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+{% endblock extendhead %}
+
+{% block contentheader %}
+    <h1>
+      Servers
+      <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-server"></i> Servers</a></li>
+      <li class="active">Control panel</li>
+    </ol>
+{% endblock contentheader %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Servers</h3>
+
+          <!-- <div class="box-tools">
+            <ul class="pagination pagination-sm no-margin pull-right">
+              <li><a href="#">&laquo;</a></li>
+              <li><a href="#">1</a></li>
+              <li><a href="#">&raquo;</a></li>
+            </ul>
+          </div> -->
+
+        </div>
+        <div class="box-body no-padding">
+            <table id="servers" class="table table-hover">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;">OS</th>
+                    <th>Hostname</th>
+                    <th>IP Address</th>
+                    <th class="text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                      <td><i class="devicon-debian-plain"></i></td>
+                      <td>SuperHost</td>
+                      <td>32.51.23.55</td>
+                      <td class="text-center"><span class="badge bg-green">UPDATED</span></td>
+                  </tr>
+                  <tr>
+                      <td><i class="devicon-debian-plain"></i></td>
+                      <td>SuperHost</td>
+                      <td>32.51.23.55</td>
+                      <td class="text-center"><span class="badge bg-green">UPDATED</span></td>
+                  </tr>
+                  <tr>
+                      <td><i class="devicon-debian-plain"></i></td>
+                      <td>SuperHost</td>
+                      <td>32.51.23.55</td>
+                      <td class="text-center"><span class="badge bg-green">UPDATED</span></td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Server Groups</h3>
+
+          <!-- <div class="box-tools">
+            <ul class="pagination pagination-sm no-margin pull-right">
+              <li><a href="#">&laquo;</a></li>
+              <li><a href="#">1</a></li>
+              <li><a href="#">&raquo;</a></li>
+            </ul>
+          </div> -->
+
+        </div>
+        <div class="box-body no-padding">
+            <table id="servers" class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Group name</th>
+                    <th class="text-center">Servers</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                      <td>Server Group #1</td>
+                      <td class="text-center">5</td>
+                      <td class="text-right"><button class="btn btn-danger"><i class="fa fa-trash"></i></button>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="alert alert-success">
+      <h4><i class="icon fa fa-plus-circle"></i> New server</h4>
+      You can add new server within seconds. Just run the following command as a root user on machine you want to add.
+      <p>&nbsp;</p>
+      <div class="input-group">
+          <input type="text" class="form-control" value="wget ...">
+          <span class="input-group-addon"><i class="fa fa-clipboard"></i></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="alert alert-info">
+      <h4><i class="icon fa fa-plus-circle"></i> New group</h4>
+      You can add new category by typing name and clicking "Add" button. You can group your servers for easier management.
+      <p>&nbsp;</p>
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="New category name">
+        <div class="input-group-btn">
+          <button type="button" class="btn btn-success">Add</button>
+        </div>
+      </div>
+      <div class="input-group">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extendfoot %}{% endblock extendfoot %}

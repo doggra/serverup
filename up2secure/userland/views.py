@@ -5,16 +5,12 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 
 
-class Home(TemplateView):
-	template_name = "userland/home.html"
+class Dashboard(TemplateView):
+	template_name = "userland/dashboard.html"
 
 
-class Servers(TemplateView):
-	template_name = "userland/servers.html"
-
-
-class Updates(TemplateView):
-	template_name = "userland/updates.html"
+class History(TemplateView):
+	template_name = "userland/history.html"
 	
 
 class Accounting(TemplateView):
