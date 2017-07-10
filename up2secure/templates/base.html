@@ -47,7 +47,7 @@
     <!-- Logo -->
     <a href="index2.html" class="logo">
       <span class="logo-mini"><b>U2S</b></span>
-      <span class="logo-lg"><i class="fa fa-server"></i><b>Up2Secure</b></span>
+      <span class="logo-lg"><i class="fa fa-server"></i>&nbsp;<b>Up2Secure</b></span>
     </a>
     <nav class="navbar navbar-static-top">
       <!-- Sidebar toggle button-->
@@ -132,26 +132,37 @@
 
       <ul class="sidebar-menu" data-widget="tree">
 
-        <li>
-          <a class="{% block menu_homepage %}{% endblock %}" href="{% url 'home' %}">
-            <i class="fa fa-home"></i> <span>Homepage</span>
+        <li class="{% block menu_homepage %}{% endblock %}">
+          <a href="{% url 'home' %}">
+            <i class="fa fa-home"></i> <span>Home</span>
           </a>
         </li>
 
-        <li>
-          <a class="{% block menu_servers %}{% endblock %}" href="{% url 'servers' %}">
+        <li class="{% block menu_servers %}{% endblock %} treeview">
+          <a href="#">
             <i class="fa fa-server"></i> <span>Servers</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
           </a>
+          <ul class="treeview-menu">
+            <li>
+              <a href="{% url 'servers' %}"><i class="fa fa-angle-right"></i> All categories</a>
+            </li>
+            <li>
+              <a href="{% url 'servers' %}"><i class="fa fa-angle-right"></i> Category #1</a>
+            </li>
+          </ul>
         </li>
 
-        <li>
-          <a class="{% block menu_updates %}{% endblock %}" href="{% url 'updates' %}">
+        <li class="{% block menu_updates %}{% endblock %}">
+          <a href="{% url 'updates' %}">
             <i class="fa fa-refresh"></i> <span>Updates</span>
           </a>
         </li>
 
-        <li>
-          <a class="{% block menu_accounting %}{% endblock %}" href="{% url 'accounting' %}">
+        <li class="{% block menu_accounting %}{% endblock %}">
+          <a href="{% url 'accounting' %}">
             <i class="fa fa-usd"></i> <span>Accounting</span>
           </a>
         </li>
@@ -161,6 +172,9 @@
   </aside>
 
   <div class="content-wrapper">
+    <section class="content-header">
+    {% block contentheader %}{% endblock contentheader %}
+    </section>
     <section class="content">
 		{% block content %}{% endblock content %}
     </section>
