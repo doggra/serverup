@@ -12,3 +12,7 @@ table#servers .devicon-debian-plain {
 .navbar-nav>.user-menu>.dropdown-menu>li.user-header {
 	height: auto;
 }
+
+table.table.table-hover td {
+	cursor: pointer;
+}

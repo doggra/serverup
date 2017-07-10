@@ -16,7 +16,23 @@
 {% endblock contentheader %}
 
 {% block content %}
-Soon ...
+<button class="btn btn-primary"><i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Create new customer</button>
+<table id="customers" class="table table-hover">
+    <thead>
+      <tr>
+        <th style="width:40px;"></th>
+        <th>Username</th>
+        <th class="text-center">Reseller</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><i class="fa fa-user"></i></td>
+          <td>Username</td>
+          <td class="text-center">Reseller_username</td>
+        </tr>
+    </tbody>
+</table>
 {% endblock content %}
 
 {% block extendfoot %}{% endblock extendfoot %}

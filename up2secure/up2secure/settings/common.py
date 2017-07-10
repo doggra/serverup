@@ -5,7 +5,7 @@ from os.path import abspath, basename, dirname, join, normpath
 
 
 DEBUG = False
-
+ALLOWED_HOSTS = ['*']
 
 ### ADMINS CONFIG ###############################
 
