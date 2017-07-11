@@ -17,6 +17,8 @@ MANAGERS = ADMINS
 
 ### PATHS CONFIG ################################
 
+LOGIN_URL = '/login/'
+
 DJANGO_ROOT = dirname(dirname(abspath(__file__)))
 PROJECT_ROOT = dirname(DJANGO_ROOT)
 SITE_NAME = basename(DJANGO_ROOT)

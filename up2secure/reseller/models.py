@@ -6,4 +6,5 @@ from django.contrib.auth.models import User
 
 
 class Reseller(models.Model):
-	user = models.ForeignKey(User)
+	user = models.OneToOneField(User)
+	customers_limit = models.IntegerField(default=1)
