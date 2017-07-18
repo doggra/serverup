@@ -1,0 +1,41 @@
+{% extends 'userland/profile_base.html' %}
+
+{% block contentheader %}
+	<h1>
+		User Profile
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i> Profile</a></li>
+		<li class="active">Show</li>
+	</ol>
+{% endblock contentheader %}
+
+{% block profile_inner %}
+{% if request.GET.alert %}
+<div class="alert alert-success alert-dismissible">
+	<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	<h4><i class="icon fa fa-check"></i> Success!</h4>
+	{% if request.GET.password_changed %}
+		Your password has been changed successfully! Thank you.
+	{% elif request.GET.updated %}
+		Your profile has been updated successfully! Thank you.
+	{% endif %}
+</div>
+{% endif %}
+<div id="profile">
+		<ul class="list-group list-group-unbordered">
+			<li class="list-group-item">
+				<b>First name</b> <div>{{ user.first_name }}</div>
+			</li>
+			<li class="list-group-item">
+				<b>Last name</b> <div>{{ user.last_name }}</div>
+			</li>
+			<li class="list-group-item">
+				<b>E-mail</b> <div>{{ user.email }}</div>
+			</li>
+		</ul>
+
+		<a href="{% url 'own_profile_edit' %}" class="btn btn-primary">Edit profile</a>
+		<a class="btn btn-danger" href="{% url 'password_change' %}">Change password</a>
+</div>
+{% endblock profile_inner %}

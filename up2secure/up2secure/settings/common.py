@@ -1,13 +1,18 @@
-# Import sys (to adjust Python path)
 import sys
-# Import some utility functions
 from os.path import abspath, basename, dirname, join, normpath
 
+from django.contrib import admin
 
 DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 ### ADMINS CONFIG ###############################
+
+
+admin.site.site_header = 'Up2Secure'
+admin.site.site_title = 'Up2Secure'
+admin.site.index_title = 'Up2Secure'
+
 
 ADMINS = (
     'Doggra', 'doggra@protonmail.com',
@@ -42,6 +47,7 @@ DEFAULT_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bootstrap',
     'userland',
     'server',
     'customer',
@@ -77,7 +83,8 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
-                'django.contrib.messages.context_processors.messages'
+                'django.template.context_processors.request',
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-3">
+
+    <div class="box box-primary">
+      <div class="box-body box-profile">
+        <img class="profile-user-img img-responsive img-circle" src="{% static 'gfx/user-160x160.png' %}" alt="User profile picture">
+
+        <h3 class="profile-username text-center">{{ user }}</h3>
+
+        <p class="text-muted text-center">{{ user.profile.type }}</p>
+        {% if user.profile.account_type == 0 %}
+          <p><b>Credits</b> <a class="pull-right">{{ user.profile.credits }}</a></p>
+          <p><b>Server Limit</b> <a class="pull-right">{{ user.profile.server_limit }}</a></p>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+  <div class="col-md-9">
+    {% block profile_inner %}{% endblock profile_inner %}
+  </div>
+</div>
+{% endblock content %}

@@ -14,7 +14,13 @@ ACCOUNT_TYPES = (
 
 class Profile(models.Model):
 	user = models.OneToOneField(User)
+	credits = models.IntegerField(default=0)
+	server_limit = models.IntegerField(default=1)
 	account_type = models.IntegerField(choices=ACCOUNT_TYPES)
 
 	def __unicode__(self):
 		return self.user.username
+
+	@property
+	def type(self):
+		return self.get_account_type_display()

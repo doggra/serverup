@@ -55,6 +55,7 @@
       </a>
       <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
+        <!--
           <li class="dropdown messages-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <i class="fa fa-envelope-o"></i>
@@ -63,10 +64,8 @@
             <ul class="dropdown-menu">
               <li class="header">You have 1 messages</li>
               <li>
-                <!-- inner menu: contains the actual data -->
                 <ul class="menu">
 
-                  <!-- start message -->
                   <li>
                     <a href="#">
                       <div class="pull-left">
@@ -79,13 +78,12 @@
                       <p>Thanks for using Up2Secure!</p>
                     </a>
                   </li>
-                  <!-- end message -->
 
                 </ul>
               </li>
               <li class="footer"><a href="#">See All Messages</a></li>
             </ul>
-          </li>
+          </li> -->
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -99,16 +97,16 @@
                 <p>
                   <strong>{{ user }}</strong><br />
                   <i>{{ user.email }}</i><br />
-                  <small><strong>{{ user.profile.get_account_type_display }}</strong></small>
+                  <small><strong>{{ user.profile.type }}</strong></small>
                 </p>
               </li>
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left">
-                  <a href="#" class="btn btn-info btn-flat">Profile</a>
+                  <a href="{% url 'own_profile' %}" class="btn btn-info btn-flat">Profile</a>
                 </div>
                 <div class="pull-right">
-                  <a href="#" class="btn btn-danger btn-flat">Sign out</a>
+                  <a href="{% url 'logout' %}" class="btn btn-danger btn-flat">Sign out</a>
                 </div>
               </li>
             </ul>
@@ -126,7 +124,7 @@
         </div>
         <div class="pull-left info">
           <p>{{ user }}</p>
-          <small>{{ user.profile.get_account_type_display }}</small>
+          <small>{{ user.profile.type }}</small>
         </div>
       </div>
 
@@ -200,7 +198,7 @@
   <footer class="main-footer">
     <div class="pull-right hidden-xs">
     </div>
-    <strong>Copyright &copy; 2017 <a href="https://nuidi.com">Radosław Przytuła</a>.</strong> All rights
+    <strong>Copyright &copy; 2017 <a href="https://nuidi.com">Doggra</a>.</strong> All rights
     reserved.
   </footer>
 

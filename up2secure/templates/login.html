@@ -53,22 +53,35 @@
           <input name="password" type="password" class="form-control" placeholder="Password">
           <span class="glyphicon glyphicon-lock form-control-feedback"></span>
         </div>
+
         <div class="row">
+        <!--
           <div class="col-xs-8">
             <div class="checkbox icheck">
               <label>
                 <input type="checkbox">&nbsp;&nbsp;Remember Me
               </label>
             </div>
-          </div>
-          <div class="col-xs-4">
+          </div>        -->
+          <div class="col-xs-12">
             <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
           </div>
         </div>
+
+        {% if request.GET.invalid %}
+        <div class="row">
+          <div class="col-xs-12">
+            <p>&nbsp;</p>
+            <p class="text-center text-danger">
+              Specified account does not exist.
+            </p>
+        </div>
+        {% endif %}
+
         {% csrf_token %}
       </form>
 
-      <a href="#">I forgot my password</a><br>
+      <!-- <a href="#">I forgot my password</a><br> -->
 
     </div>
   </div>

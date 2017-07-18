@@ -10,29 +10,36 @@
       <small>List</small>
     </h1>
     <ol class="breadcrumb">
-      <li><a href="#"><i class="fa fa-server"></i> Customers</a></li>
+      <li><a href="#"><i class="fa fa-user-circle-o"></i> Customers</a></li>
       <li class="active">List</li>
     </ol>
 {% endblock contentheader %}
 
 {% block content %}
 <button class="btn btn-primary"><i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Create new customer</button>
-<table id="customers" class="table table-hover">
-    <thead>
-      <tr>
-        <th style="width:40px;"></th>
-        <th>Username</th>
-        <th class="text-center">Reseller</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><i class="fa fa-user"></i></td>
-          <td>Username</td>
-          <td class="text-center">Reseller_username</td>
-        </tr>
-    </tbody>
-</table>
+
+<div id="customers" class="box">
+  <div class="box-body">
+    <table class="table table-hover">
+        <thead>
+          <tr>
+            <th style="width:24px;"></th>
+            <th>Username</th>
+            <th class="text-center">Servers</th>
+            <th class="text-center" title="Servers limit">Limit&nbsp;&nbsp;(<i class="fa fa-server"></i>)</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr>
+              <td><i class="fa fa-user"></i></td>
+              <td>Username</td>
+              <td class="text-center">1</td>
+              <td class="text-center">1</td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+</div>
 {% endblock content %}
 
 {% block extendfoot %}{% endblock extendfoot %}

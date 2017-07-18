@@ -16,3 +16,11 @@ table#servers .devicon-debian-plain {
 table.table.table-hover td {
 	cursor: pointer;
 }
+
+#resellers, #customers {
+	margin-top: 20px;
+}
+
+#profile ul li {
+	padding:20px;
+}

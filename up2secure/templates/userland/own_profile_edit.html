@@ -1,0 +1,29 @@
+{% extends 'userland/profile_base.html' %}
+
+{% load bootstrap_forms %}
+
+{% block contentheader %}
+  <h1>
+    User Profile
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Profile</a></li>
+    <li class="active">Edit</li>
+  </ol>
+{% endblock contentheader %}
+
+{% block profile_inner %}
+<div id="settings">
+  <form method="POST">
+    {% csrf_token %}
+
+    {{ form|as_bootstrap }}
+
+    <div class="form-group">
+      <button type="submit" class="btn btn-success">Submit</button>
+      <a class="btn btn-danger" href="{% url 'own_profile' %}">Cancel</a>
+    </div>
+
+  </form>
+</div>
+{% endblock profile_inner %}
