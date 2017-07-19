@@ -33,6 +33,7 @@ class Server(models.Model):
 	ip = models.GenericIPAddressField(default='127.0.0.1')
 	hostname = models.CharField(max_length=255, blank=True)
 	status = models.IntegerField(default=0, choices=STATUS)
+	public_key = models.TextField(blank=True)
 	private_key = models.TextField(blank=True)
 
 	@property

@@ -16,7 +16,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from .models import Server, ServerGroup, PackageUpdate
-
+from django.contrib.auth.models import User
 
 @method_decorator(login_required, name='dispatch')
 class ServersControlPanelView(TemplateView):
@@ -100,8 +100,6 @@ def remove_server_group(request):
 
 def install_server(request):
 
-	__VAR_USER = request.user.username
-	__VAR_SSH_KEY = None
 	__VAR_CHECK_ACCESS_URL = "http://{}/install/".format(request.get_host(),)
 
 	if request.method == "POST":
@@ -115,13 +113,18 @@ def install_server(request):
 		user = request.GET['u']
 		key_path = join(settings.PROJECT_ROOT, 'keys', user)
 
-		# Generate key
+		# Generate key and create server
 		os.system('ssh-keygen -t rsa -b 4096 -C up2secure -f {} -N ""'.format(key_path,))
 		private_key = os.system('cat {}'.format(key_path))
 		public_key = os.system('cat {}'.format(key_path+".pub"))
-		print(private_key, public_key)
+		
+		server = Server.objects.create(user=User.objects.get(username='Customer'), public_key=public_key, private_key=private_key)
 
 		with open(join(settings.PROJECT_ROOT, 'server_install.sh'), 'r') as f:
 			install_script = f.read()
+			install_script = install_script.replace('__VAR_CHECK_ACCESS_URL', __VAR_CHECK_ACCESS_URL)
+			install_script = install_script.replace('__VAR_USER', __VAR_USER)
+			install_script = install_script.replace('__VAR_SSH_KEY', public_key)
+
 		return HttpResponse(install_script)
 
