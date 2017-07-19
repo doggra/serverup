@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from os.path import join
-from django.conf import setting
+from django.conf import settings
 from django.shortcuts import render
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -26,7 +26,8 @@ class ServersControlPanelView(TemplateView):
 		context['servers'] = Server.objects.filter(user=self.request.user)
 		context['server_groups'] = ServerGroup.objects.filter(user=self.request.user)
 
-		context['install_script'] = "wget -O - localhost:8000/install/ | bash"
+		site_address = self.request.get_host()
+		context['install_script'] = "wget -O - http://{}/install/ | bash".format(site_address)
 		return context
 
 
@@ -60,6 +61,6 @@ def add_group(request):
 
 def install_server(request):
 	install_script = ""
-	with open(join(PROJECT_ROOT, 'install.sh', 'r')) as f:
+	with open(join(settings.PROJECT_ROOT, 'install.sh', 'r')) as f:
 		install_script = f.read()
 	return HttpResponse(install_script)
