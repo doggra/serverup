@@ -102,7 +102,7 @@ def install_server(request):
 
 	__VAR_USER = request.user.username
 	__VAR_SSH_KEY = None
-	__VAR_CHECK_ACCESS_URL = "http://{}/install/".format(self.request.get_host(),)
+	__VAR_CHECK_ACCESS_URL = "http://{}/install/".format(request.get_host(),)
 
 	if request.method == "POST":
 		user = request.POST['u']
