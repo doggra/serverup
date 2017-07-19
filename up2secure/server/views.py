@@ -18,9 +18,6 @@ from django.views.generic.list import ListView
 from .models import Server, ServerGroup, PackageUpdate
 
 
-__SITE_ADDRESS = self.request.get_host()
-
-
 @method_decorator(login_required, name='dispatch')
 class ServersControlPanelView(TemplateView):
 	template_name = "server/servers.html"
@@ -29,7 +26,7 @@ class ServersControlPanelView(TemplateView):
 		context = super(ServersControlPanelView, self).get_context_data(**kwargs)
 		context['servers'] = Server.objects.filter(user=self.request.user)
 		context['server_groups'] = ServerGroup.objects.filter(user=self.request.user)
-		context['install_script'] = "wget -O - http://{}/install/?u=123abc | bash".format(__SITE_ADDRESS)
+		context['install_script'] = "wget -O - http://{}/install/?u=123abc | bash".format(self.request.get_host())
 		return context
 
 
@@ -105,7 +102,7 @@ def install_server(request):
 
 	__VAR_USER = request.user.username
 	__VAR_SSH_KEY = None
-	__VAR_CHECK_ACCESS_URL = "http://{}/install/".format(__SITE_ADDRESS,)
+	__VAR_CHECK_ACCESS_URL = "http://{}/install/".format(self.request.get_host(),)
 
 	if request.method == "POST":
 		user = request.POST['u']
