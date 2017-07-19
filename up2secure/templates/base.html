@@ -155,11 +155,6 @@
                 <i class="fa fa-angle-right"></i> Updates
               </a>
             </li>
-            {% for group in user.servergroup_set.all %}
-            <li>
-              <a href="{% url 'server_group' group.id %}"><i class="fa fa-angle-right"></i> {{ group.name }}</a>
-            </li>
-            {% endfor %}
           </ul>
         </li>
 

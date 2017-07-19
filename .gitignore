@@ -1,2 +1,4 @@
 *.py[cod]
 env/
+script.sh
+*.key
