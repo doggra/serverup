@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+Are you sure you want to delete group "{{ object.name }}"?
+<form method="POST">
+{% csrf_token %}
+<input type="submit" value="Yes" class="btn btn-success" />
+<a href="{% url 'server_group' object.pk %}" class="btn btn-danger">No, cancel</a>
+</form>
+{% endblock %}

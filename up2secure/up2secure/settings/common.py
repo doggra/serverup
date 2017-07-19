@@ -49,9 +49,7 @@ DEFAULT_APPS = [
     'django.contrib.staticfiles',
     'bootstrap',
     'userland',
-    'server',
-    'customer',
-    'reseller'
+    'server'
 ]
 
 

@@ -9,20 +9,31 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth import views as auth_views
 
-from django.views.generic import View
-from django.views.generic import TemplateView
+from django.views.generic import View, TemplateView
+from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView
 
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
+from .models import Customer, Reseller
 from .forms import OwnProfileEditForm
+from server.models import Server
 
 
 @method_decorator(login_required, name='dispatch')
 class Dashboard(TemplateView):
 	template_name = "dashboard.html"
 
+	def get_context_data(self, **kwargs):
+		context = super(Dashboard, self).get_context_data(**kwargs)
+		if self.request.user.profile.account_type == 0:
+			context['servers_count'] = Server.objects.filter(user=self.request.user).count()
+		elif self.request.user.profile.account_type == 1:
+			context['servers_count'] = Server.objects.filter(user__customer__reseller=self.request.user).count()
+		elif self.request.user.profile.account_type == 2:
+			context['servers_count'] = Server.objects.count()
+		return context
 
 @method_decorator(login_required, name='dispatch')
 class History(TemplateView):
@@ -82,3 +93,18 @@ class ChangePasswordView(auth_views.PasswordChangeView):
 
 	def get_success_url(self):
 		return "{}?alert=1&password_changed=1".format(reverse('own_profile'),)
+
+
+@method_decorator(login_required, name='dispatch')
+class CustomerListView(ListView):
+	model = Customer
+
+
+@method_decorator(login_required, name='dispatch')
+class ResellerListView(ListView):
+    model = Reseller
+
+
+@method_decorator(login_required, name='dispatch')
+class Accounting(TemplateView):
+	template_name = "userland/accounting.html"

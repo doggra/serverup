@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block menu_server %}active{% endblock %}
+
+{% block contentheader %}
+	<h1>
+	  Servers
+	  <small>Updates</small>
+	</h1>
+	<ol class="breadcrumb">
+	  <li><a href="{% url 'servers' %}"><i class="fa fa-level-up"></i> Servers</a></li>
+	  <li class="active">Updates</li>
+	</ol>
+{% endblock contentheader %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+	<div class="box">
+		<div class="box-header">
+		  <h3 class="box-title">Available updates</h3>
+		</div>
+		<div class="box-body no-padding">
+			<table id="servers" class="table table-hover">
+				<thead>
+				  <tr>
+					<th>Date & time</th>
+					<th>Server</th>
+				  </tr>
+				</thead>
+				<tbody>
+				{% for update in object_list %}
+					<tr>
+						<td>{{ update.datetime }}</td>
+						<td>{{ update.server }}</td>
+					</tr>
+				{% empty %}
+					<tr>
+						<td class="text-center" colspan="2">
+							No updates available.
+						</td>
+					</tr>
+				{% endfor %}
+					
+				</tbody>
+			</table>
+		</div>
+	</div>
+  </div>
+</div>
+{% endblock %}

@@ -13,7 +13,7 @@ table#servers .devicon-debian-plain {
 	height: auto;
 }
 
-table.table.table-hover td {
+table.table.table-hover tr.link td {
 	cursor: pointer;
 }
 

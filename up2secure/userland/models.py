@@ -12,6 +12,18 @@ ACCOUNT_TYPES = (
 )
 
 
+class Reseller(models.Model):
+	user = models.OneToOneField(User)
+	customers_limit = models.IntegerField(default=1)
+
+
+class Customer(models.Model):
+	user = models.OneToOneField(User)
+	credits = models.IntegerField(default=0)
+	servers_limit = models.IntegerField(default=1)
+	reseller = models.ForeignKey(Reseller, blank=True)
+
+
 class Profile(models.Model):
 	user = models.OneToOneField(User)
 	credits = models.IntegerField(default=0)

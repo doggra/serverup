@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block menu_server %}active{% endblock %}
+
+{% block contentheader %}
+	<h1>
+		Server group
+		<small>{{ object.name }}</small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="{% url 'servers' %}"><i class="fa fa-server"></i> Servers</a></li>
+		<li class="active">{{ object.name }}</li>
+	</ol>
+{% endblock contentheader %}
+
+{% block content %}
+<p><a href="{% url 'delete_group' object.pk %}" class="btn btn-danger">Delete group</a></p>
+<div class="box">
+	<div class="box-header">
+		<h3 class="box-title">Servers</h3>
+	</div>
+	<div class="box-body no-padding">
+		<table id="servers" class="table table-hover">
+			<thead>
+				<tr>
+				<th style="width: 40px;">OS</th>
+				<th>Hostname</th>
+				<th>IP Address</th>
+				<th class="text-center">Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for server in object.servers.all %}
+				<tr>
+					<td>{{ server.show_os_icon }}</td>
+					<td>{{ server.hostname }}</td>
+					<td>{{ server.ip }}</td>
+					<td class="text-center"><span class="badge bg-green">UP&nbsp;TO&nbsp;DATE</span></td>
+				</tr>
+				{% empty %}
+				<tr>
+					<td class="text-center" colspan="4">
+						No servers in that group
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	</div>
+{% endblock content %}
