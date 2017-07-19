@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from os.path import join
+from django.conf import setting
 from django.shortcuts import render
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -58,6 +60,6 @@ def add_group(request):
 
 def install_server(request):
 	install_script = ""
-	with open('/app/up2secure/install.sh', 'r') as f:
+	with open(join(PROJECT_ROOT, 'install.sh', 'r')) as f:
 		install_script = f.read()
 	return HttpResponse(install_script)
