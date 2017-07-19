@@ -1,6 +1,7 @@
 #!/bin/bash
 
-SSHKEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDM9h/sKQEUHjiAWJo7wMx8V9D1XXvDIrRgbie9oryDxVBPFAtWLRhzv1+NbaAexljTIXGbfB7oy2HUKzwmVmQ21Y0Wrl863Fdw3HZU8ZFhiQWSh6MNNfYWMZ668INeoIwohVdZYqIoU6d2Ldaj4jG/AoQ/KLH6556YVeSLRExioV3y9oHBBN1vTG/zr9VtWSwgxcNlfTFlij1HB9SJfcb+RE3GAbLg0xCccmqttmlRHbGspe96YaVXuknmLK49SOLiGm/Yu9ySAU+FMh3Lgv2/2o6CNFzQ0TJjD6TgLGhwt536lDNLwDMyWxCWrbW5cgDtwZgPn8wIsqbL3Sdh0Qmfp/3UKhPNFmfr7yUasEsPBRRWNQ7JeqRmnUVssOiJbBNBmzey+om5A88xCRWMzYzhh+AUFLr5OD8GDKysFdhThAICD3/9cvE5flLUbi0x2N1xPQ+RhHpeNHE6qJwoPKN38BcZxhDmU74v8yJ5bUbAwCauGebGaYGFFlUgWQ3ctnfr9xUH5W1+SsPZzABWU4UvHpTkpAcGQa0HJ4LxqiHyVu73sFrHzDXFP8u5iqMHWj/CB9pBk5zbnBi6opWLcBDq8UiqqnHnLDInd1wZaeP9mDcHgSEBdZWjjzhvflmrKINPjukiU28RQDg7FkaRwfncLtFvYwPuYz66Lxm0RWelbw== up2secure"
+USER="__VAR_USER"
+SSHKEY="__VAR_SSH_KEY"
 
 echo ""
 echo -e "\e[1;32mInstallation started..."
@@ -54,6 +55,16 @@ if ! [ "$SSHPORT" -eq "$SSHPORT" ] 2>/dev/null; then
     exit 1
 fi
 echo "SSH port: ${SSHPORT}"
+
+# Check for dependencies
+echo "Check for dependencies..."
+if ! hash wget 2>/dev/null; then
+    echo "Dependency wget will be installed"
+    ${BACKEND} -y install wget &> /dev/null
+else
+    echo -e "\e[0;32mwget found."
+    echo -e "\e[0m"
+fi
 
 # Uninstall old SSH keys
 sed -i '/up2secure/d' ~/.ssh/authorized_keys &> /dev/null
@@ -109,3 +120,21 @@ else
     echo "PermitRootLogin yes # up2secure" >> /etc/ssh/sshd_config
     echo "Public key authorization enabled"
 fi
+
+# Callback to Django ap[]
+echo "Checking access to server..."
+OUTPUT=$(wget -q  --post-data 'u=${USER}&h=${HOSTNAME}&d=${SYSTEM}&s=${SSHPORT}' -O - "__VAR_CHECK_ACCESS_URL")
+if ! [ "$OUTPUT" == "OK" ]; then
+    echo -e "\e[1;31mNo access to this server." 1>&2
+    echo -e "\e[1;31mPlease try it again." 1>&2
+    echo -e "\e[0m${OUTPUT}"
+    echo -e "\e[0m"
+    exit 1
+else
+    echo -e "\e[0;32mAccess to server works!"
+    echo -e "\e[0m"
+fi
+
+echo -e "\e[1;32mInstallation finished\e[0m"
+echo ""
+

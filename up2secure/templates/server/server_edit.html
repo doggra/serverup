@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% load bootstrap_forms %}
+
+{% block contentheader %}
+  <h1>
+    Server edit
+    <small>{{ object.hostname }}</small>
+  </h1>
+  
+  <ol class="breadcrumb">
+    <li><a href="{% url 'servers' %}"><i class="fa fa-server"></i> Servers</a></li>
+    <li><a href="{% url 'server_details' object.pk %}">Details</a></li>
+    <li class="active">Edit</li>
+  </ol>
+{% endblock contentheader %}
+
+{% block content %}
+<div class="box">
+  <div class="box-body">
+    <form method="POST">
+      {% csrf_token %}
+
+      {{ form|as_bootstrap }}
+
+      <div class="form-group">
+        <button type="submit" class="btn btn-success">Submit</button>
+        <a class="btn btn-danger" href="{% url 'server_details' object.pk %}">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock content %}

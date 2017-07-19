@@ -4,6 +4,10 @@
 
 {% block menu_server %}active{% endblock %}
 
+{% block extendhead %}
+<link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+{% endblock extendhead %}
+
 {% block contentheader %}
 	<h1>
 		Server group
@@ -25,7 +29,7 @@
 		<table id="servers" class="table table-hover">
 			<thead>
 				<tr>
-				<th style="width: 40px;">OS</th>
+				<th class="text-center" style="width: 40px;">OS</th>
 				<th>Hostname</th>
 				<th>IP Address</th>
 				<th class="text-center">Status</th>
@@ -33,8 +37,8 @@
 			</thead>
 			<tbody>
 				{% for server in object.servers.all %}
-				<tr>
-					<td>{{ server.show_os_icon }}</td>
+				<tr class="link" data-href="{% url 'server_details' server.pk %}">
+					<td class="text-center">{{ server.show_os_icon|safe }}</td>
 					<td>{{ server.hostname }}</td>
 					<td>{{ server.ip }}</td>
 					<td class="text-center"><span class="badge bg-green">UP&nbsp;TO&nbsp;DATE</span></td>

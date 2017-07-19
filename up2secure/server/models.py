@@ -9,10 +9,22 @@ OS_DISTRO = (
 	(1, "Centos"),
 )
 
-SERVER_STATUS = (
-	(0, "Up to date"),
-	(1, "Not updated"),
+STATUS = (
+	(0, "UPDATED"),
+	(1, "PENDING"),
+	(2, "IGNORED"),
 )
+
+
+class Package(models.Model):
+	name = models.CharField(max_length=255)
+
+
+class PackageUpdate(models.Model):
+	server = models.ForeignKey('Server', on_delete=models.CASCADE)
+	package = models.ForeignKey(Package)
+	version = models.CharField(max_length=255, blank=True)
+	status = models.IntegerField(default=1, choices=STATUS)
 
 
 class Server(models.Model):
@@ -20,8 +32,17 @@ class Server(models.Model):
 	os = models.IntegerField(null=True, choices=OS_DISTRO)
 	ip = models.GenericIPAddressField(default='127.0.0.1')
 	hostname = models.CharField(max_length=255, blank=True)
-	status = models.IntegerField(default=0, choices=SERVER_STATUS)
+	status = models.IntegerField(default=0, choices=STATUS)
 	private_key = models.TextField(blank=True)
+
+	@property
+	def show_status(self):
+		if self.status == 0:
+			return "<span class='badge bg-green'>UPDATED</span>"
+		elif self.status == 1:
+			count_pending_updates = UpdatePackage.objects.filter(server=self, status=1).count()
+			return "<span class='badge bg-orange'>{} PENDING UPDATES</span>"\
+																.format(count_pending_updates,)
 
 	@property
 	def show_os_icon(self):
@@ -47,18 +68,3 @@ class ServerGroup(models.Model):
 
 	def __unicode__(self):
 		return self.name
-
-
-class Update(models.Model):
-	datetime = models.DateTimeField(auto_now_add=True)
-	server = models.ForeignKey(Server)
-
-
-class Package(models.Model):
-	name = models.CharField(max_length=255)
-
-
-class UpdatePackage(models.Model):
-	update = models.ForeignKey(Update)
-	package = models.ForeignKey(Package)
-	version = models.CharField(max_length=255, blank=True)

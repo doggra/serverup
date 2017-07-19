@@ -9,16 +9,147 @@
 {% endblock extendhead %}
 
 {% block contentheader %}
-    <h1>
-      Server details
-      <small>{{ object.hostname }}</small>
-    </h1>
-    <ol class="breadcrumb">
-      <li><a href="{% url 'servers' %}"><i class="fa fa-server"></i> Servers</a></li>
-      <li class="active">Details</li>
-    </ol>
+	<h1>
+		Server details
+		<small>{{ object.hostname }}</small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="{% url 'servers' %}"><i class="fa fa-server"></i> Servers</a></li>
+		<li class="active">Details</li>
+	</ol>
 {% endblock contentheader %}
 
 {% block content %}
-hihi
+{% if request.GET.alert %}
+<div class="alert alert-success alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+  <h4><i class="icon fa fa-check"></i> Success!</h4>
+  {% if request.GET.updated %}
+    Your server has been updated successfully!
+  {% endif %}
+</div>
+{% endif %}
+<div class="row">
+	<div class="col-md-5">
+		<div class="box">
+			<div class="box-header with-border">
+				<h3 class="box-title">Server information</h3>
+			</div>
+			<div class="box-body">
+				<table class="table table-bordered">
+					<tbody>
+						<tr>
+							<td>Status</td>
+							<td>{{ object.show_status|safe }}</td>
+						</tr>
+						<tr>
+							<td>OS</td>
+							<td>{{ object.get_os_display }}</td>
+						</tr>
+						<tr>
+							<td>Hostname</td>
+							<td>{{ object.hostname }}</td>
+						</tr>
+						<tr>
+							<td>IP</td>
+							<td>{{ object.ip }}</td>
+						</tr>
+						{% if request.user.profile.account_type > 0 %}
+						<tr>
+							<td>Owner</td>
+							<td>{{ object.user.username }}</td>
+						</tr>
+						{% endif %}
+					</tbody>
+				</table>
+				<a href="{% url 'server_edit' object.pk %}" class="btn btn-primary btn-block">Edit server</a>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-7">
+		<div class="box">
+			<div class="box-header with-border">
+				<h3 class="box-title">Server groups</h3>
+			</div>
+			<div class="box-body">
+				<h4>Server is in the following groups:</h4>
+				<table class="table table-bordered table-hover">
+						<tbody>
+						{% for group in object.servergroup_set.all %}
+							<tr class="link" data-href="{% url 'server_group' group.pk %}">
+								<td>{{ group.name }}</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+
+				{% if available_groups %}
+				<br/>
+				<form action="{% url 'assign_server_group' %}" method="POST">
+				<label for="groupid">Assign server to group</label>
+
+				<div class="input-group">
+	                <select class="form-control" id="groupid" name="groupid">
+						{% for group in available_groups %}
+							<option value="{{ group.pk }}">{{ group.name }}</option>
+						{% endfor %}
+					</select>
+                    <span class="input-group-btn">
+						<input type="submit" value="Assign" class="btn btn-success" />
+                    </span>
+	              </div>
+					
+					<input type="hidden" name="serverid" value="{{ object.pk }}" />
+					{% csrf_token %}
+				</form>
+				{% endif %}
+
+				{% if object.servergroup_set.all %}
+				<br/>
+				<form action="{% url 'remove_server_group' %}" method="POST">
+					<label for="groupid">Remove server from grop</label>
+					<div class="input-group">
+		                <select class="form-control" id="groupid" name="groupid">
+							{% for cat in request.user.servergroup_set.all %}
+								<option value="{{ cat.pk }}">{{ cat.name }}</option>
+							{% endfor %}
+						</select>
+	                    <span class="input-group-btn">
+							<input type="submit" value="Remove" class="btn btn-danger" />
+	                    </span>
+	            	</div>
+					<input type="hidden" name="serverid" value="{{ object.pk }}" />
+					{% csrf_token %}
+				</form>
+				{% endif %}
+
+				<br/>
+				<form method="POST" action="{% url 'add_group' %}">
+					{% csrf_token %}
+
+					<label for="name">Add new group</label>
+					<div class="input-group">
+						<input type="text" name="name" class="form-control" placeholder="New category name">
+						<div class="input-group-btn">
+							<input type="submit" class="btn btn-success" value="Add new">
+						</div>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-xs-12">
+		<div class="box">
+			<div class="box-header with-border">
+				<h3 class="box-title">Updates history</h3>
+			</div>
+			<div class="box-body">
+			No history yet.
+			</div>
+		</div>
+	</div>
+</div>
 {% endblock content %}

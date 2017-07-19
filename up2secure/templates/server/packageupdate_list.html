@@ -10,7 +10,7 @@
 	  <small>Updates</small>
 	</h1>
 	<ol class="breadcrumb">
-	  <li><a href="{% url 'servers' %}"><i class="fa fa-level-up"></i> Servers</a></li>
+	  <li><a href="{% url 'servers' %}"><i class="fa fa-server"></i> Servers</a></li>
 	  <li class="active">Updates</li>
 	</ol>
 {% endblock contentheader %}
@@ -28,6 +28,8 @@
 				  <tr>
 					<th>Date & time</th>
 					<th>Server</th>
+					<th>Package</th>
+					<th>Version</th>
 				  </tr>
 				</thead>
 				<tbody>
@@ -35,6 +37,8 @@
 					<tr>
 						<td>{{ update.datetime }}</td>
 						<td>{{ update.server }}</td>
+						<td>{{ update.package }}</td>
+						<td>{{ update.version }}</td>
 					</tr>
 				{% empty %}
 					<tr>
