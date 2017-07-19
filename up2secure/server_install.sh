@@ -12,6 +12,7 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 echo -e "\e[0;32mRoot access granted."
+echo -e "\e[0m"
 
 # Check for system type
 if [[ $(awk -F '=' '/DISTRIB_ID/ { print $2 }' /etc/*-release) == "Ubuntu" ]]; then

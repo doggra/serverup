@@ -61,6 +61,6 @@ def add_group(request):
 
 def install_server(request):
 	install_script = ""
-	with open(join(settings.PROJECT_ROOT, 'install.sh'), 'r') as f:
+	with open(join(settings.PROJECT_ROOT, 'server_install.sh'), 'r') as f:
 		install_script = f.read()
 	return HttpResponse(install_script)
