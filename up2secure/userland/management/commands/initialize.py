@@ -9,6 +9,6 @@ class Command(BaseCommand):
         user = User(username="Administrator", is_staff=True, is_superuser=True)
         user.set_password('admin2017')
         user.save()
-        profile = Profile(user=user)
+        profile = Profile(user=user, account_type=2)
         profile.save()
         print("User {0} crated".format(user.username))
