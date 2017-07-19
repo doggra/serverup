@@ -6,7 +6,7 @@ from userland.models import Profile
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        user = User(username="Administrator", is_staff=True, is_superuser=True)
+        user = User(username="Administrator", account_type=2, is_staff=True, is_superuser=True)
         user.set_password('admin2017')
         user.save()
         profile = Profile(user=user)
