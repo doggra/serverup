@@ -28,7 +28,7 @@ class Profile(models.Model):
 	user = models.OneToOneField(User)
 	credits = models.IntegerField(default=0)
 	server_limit = models.IntegerField(default=1)
-	account_type = models.IntegerField(choices=ACCOUNT_TYPES)
+	account_type = models.IntegerField(choices=ACCOUNT_TYPES, default=0)
 
 	def __unicode__(self):
 		return self.user.username
