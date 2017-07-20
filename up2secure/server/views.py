@@ -120,9 +120,9 @@ def install_server(request):
 		port = request.POST['p']
 		s_uuid = request.POST['s']
 
-		s = Server.objects.get(user__profile__uuid=user, uuid=s_uuid, install=True)
-		s.install = False
+		s = Server.objects.get(user__profile__uuid=user, uuid=s_uuid)
 		s.host = host
+		s.ip = ip
 
 		try:
 			s.os = int(dist)
@@ -207,10 +207,10 @@ def install_server(request):
 						print(e)
 
 				return HttpResponse(install_script)
-			return HttpResponse("")
 
-		except Exception, (code, e):
-			print(code, e)
+		except Exception, e:
+			print(e)
+			return HttpResponse("")
 
 		finally:
 			os.system('rm %s' % private_key_path)
