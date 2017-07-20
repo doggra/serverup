@@ -35,7 +35,7 @@ class Server(models.Model):
 	status = models.IntegerField(default=0, choices=STATUS)
 	public_key = models.TextField(blank=True)
 	private_key = models.TextField(blank=True)
-	install = models.Boolean(default=True)
+	install = models.BooleanField(default=True)
 
 	@property
 	def show_status(self):
