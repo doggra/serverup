@@ -128,7 +128,7 @@ fi
 
 # Callback to Django ap[]
 echo "Checking access to server..."
-OUTPUT=$(wget -q  --post-data 'u=${USER}&i=${SSHIP}&h=${HOSTNAME}&d=${SYSTEM}&s=${SSHPORT}' -O - "__VAR_HOSTNAME_FOR_URL")
+OUTPUT=$(wget -q  --post-data="u=${USER}&i=${SSHIP}&h=${HOSTNAME}&d=${SYSTEM}&s=${SSHPORT}" -O - "__VAR_HOSTNAME_FOR_URL")
 if ! [ "$OUTPUT" == "OK" ]; then
     echo -e "\e[1;31mNo access to this server." 1>&2
     echo -e "\e[1;31mPlease try it again." 1>&2
