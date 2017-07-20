@@ -75,8 +75,14 @@ class PackageUpdateListView(ListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class DeleteGroupView(DeleteView):
+class ServerGroupDeleteView(DeleteView):
 	model = ServerGroup
+	success_url = reverse_lazy('servers')
+
+
+@method_decorator(login_required, name='dispatch')
+class ServerDeleteView(DeleteView):
+	model = Server
 	success_url = reverse_lazy('servers')
 
 
