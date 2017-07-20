@@ -7,6 +7,6 @@
 <form method="POST">
 {% csrf_token %}
 <input type="submit" value="Yes" class="btn btn-success" />
-<a href="{% url 'server' object.pk %}" class="btn btn-danger">No, cancel</a>
+<a href="{% url 'servers' object.pk %}" class="btn btn-danger">No, cancel</a>
 </form>
 {% endblock %}
