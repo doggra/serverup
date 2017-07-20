@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import time
 import os
 import paramiko
 import StringIO
@@ -25,12 +26,13 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 @method_decorator(login_required, name='dispatch')
-class ServersControlPanelView(TemplateView):
+class Servers(TemplateView):
 	template_name = "server/servers.html"
 
 	def get_context_data(self, **kwargs):
-		context = super(ServersControlPanelView, self).get_context_data(**kwargs)
+		context = super(Servers, self).get_context_data(**kwargs)
 		context['servers'] = Server.objects.filter(user=self.request.user)
+		context['updates'] = PackageUpdate.objects.filter(status=1)
 		context['server_groups'] = ServerGroup.objects.filter(user=self.request.user)
 		context['install_script'] = "wget -O - http://{}/install/?u={} | bash".format( \
 							self.request.get_host(), self.request.user.profile.uuid)
@@ -128,6 +130,8 @@ def install_server(request):
 		print(request.POST.items())
 
 		s = Server.objects.get(user__profile__uuid=user, uuid=s_uuid)
+
+		# Set variables
 		s.hostname = host
 		s.ip = ip
 
@@ -141,6 +145,8 @@ def install_server(request):
 		except TypeError:
 			pass
 
+		# Installed.
+		s.install = False
 		s.save()
 
 		# Check SSH connection.
@@ -222,3 +228,9 @@ def install_server(request):
 
 		finally:
 			os.system('rm %s' % private_key_path)
+			time.sleep(5)
+			try:
+				if server.install == True:
+					server.detele()
+			except:
+				pass
