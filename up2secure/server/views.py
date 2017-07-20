@@ -119,9 +119,10 @@ def install_server(request):
 		dist = request.POST['d']
 		port = request.POST['p']
 		s_uuid = request.POST['s']
+		print(request.POST.items())
 
 		s = Server.objects.get(user__profile__uuid=user, uuid=s_uuid)
-		s.host = host
+		s.hostname = host
 		s.ip = ip
 
 		try:
@@ -139,7 +140,7 @@ def install_server(request):
 		# Check SSH connection.
 		try:
 			s_ip = s.ip
-			priv_key = s.first().private_key
+			priv_key = s.private_key
 			pkey = paramiko.RSAKey.from_private_key(StringIO.StringIO(priv_key))
 
 			ssh = paramiko.SSHClient()
@@ -162,11 +163,12 @@ def install_server(request):
 
 		except paramiko.AuthenticationException:
 			print "Authentication failed when connecting to %s" % host
-			HttpResponse("FAIL")
+			return HttpResponse("FAIL")
 
-		except Exception, (code, e):
-			print "Could not SSH to %s, waiting for it to start" % host
-			HttpResponse("FAIL: ({}) {}".format(code, e))
+		except Exception, e:
+			print "Could not SSH to %s" % host
+			print(e)
+			return HttpResponse("FAIL: {}".format(e))
 
 	elif request.method == "GET":
 		user = request.GET['u']
@@ -177,7 +179,7 @@ def install_server(request):
 			os.system('ssh-keygen -t rsa -b 4096 -C up2secure -f {} -N ""'.format(private_key_path,))
 			private_key = os.popen('cat {}'.format(private_key_path)).read()
 			__VAR_SSH_KEY = os.popen('cat {}'.format(private_key_path+".pub")).read()
-			__VAR_USER = request.GET.get('u', '')
+			__VAR_USER = str(request.GET.get('u', ''))
 			user = User.objects.filter(profile__uuid=__VAR_USER)
 
 			if user:
@@ -185,7 +187,7 @@ def install_server(request):
 											   public_key=__VAR_SSH_KEY,
 											   private_key=private_key)
 
-				__VAR_SERVER_UUID = server.uuid
+				__VAR_SERVER_UUID = str(server.uuid)
 
 				# Open file with server instalation script.
 				with open(join(settings.PROJECT_ROOT, 'server_install.sh'), 'r') as f:

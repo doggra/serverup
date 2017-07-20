@@ -1,7 +1,7 @@
 #!/bin/bash
 
 USER="__VAR_USER"
-SERVER_UUID ="__VAR_SERVER_UUID"
+SERVERUUID ="__VAR_SERVER_UUID"
 SSHKEY="__VAR_SSH_KEY"
 
 echo ""
@@ -118,7 +118,7 @@ fi
 
 # Callback to Django ap[]
 echo "Checking access to server..."
-OUTPUT=$(wget -q  --post-data="s=${SERVER_UUID}&u=${USER}&i=${SSHIP}&h=${HOSTNAME}&d=${SYSTEM}&p=${SSHPORT}" -O - "__VAR_HOSTNAME_FOR_URL")
+OUTPUT=$(wget -q  --post-data="s=${SERVERUUID}&u=${USER}&i=${SSHIP}&h=${HOSTNAME}&d=${SYSTEM}&p=${SSHPORT}" -O - "__VAR_HOSTNAME_FOR_URL")
 if ! [ "$OUTPUT" == "OK" ]; then
     echo -e "\e[1;31mNo access to this server." 1>&2
     echo -e "\e[1;31mPlease try it again." 1>&2
