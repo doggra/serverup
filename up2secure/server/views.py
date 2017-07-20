@@ -130,33 +130,41 @@ def install_server(request):
 
 	elif request.method == "GET":
 		user = request.GET['u']
-		key_path = join(settings.PROJECT_ROOT, 'keys', user)
+		private_key_path = join(settings.PROJECT_ROOT, 'keys', user)
 
-		# Generate key and assign them to var
-		os.system('ssh-keygen -t rsa -b 4096 -C up2secure -f {} -N ""'.format(key_path,))
-		private_key = os.popen('cat {}'.format(key_path)).read()
-		__VAR_SSH_KEY = os.popen('cat {}'.format(key_path+".pub")).read()
-		__VAR_USER = request.GET['u']
+		try:
+			# Generate ssh key and assign it to var
+			os.system('ssh-keygen -t rsa -b 4096 -C up2secure -f {} -N ""'.format(private_key_path,))
+			private_key = os.popen('cat {}'.format(private_key_path)).read()
+			__VAR_SSH_KEY = os.popen('cat {}'.format(private_key_path+".pub")).read()
+			__VAR_USER = request.GET.get('u', '')
+			user = User.objects.filter(profile__uuid=__VAR_USER)
 
-		user = User.objects.get(profile__uuid=__VAR_USER)
-		server = Server.objects.create(user=user, 
-									   public_key=__VAR_SSH_KEY,
-									   private_key=private_key)
+			if user:
+				server = Server.objects.create(user=user[0],
+											   public_key=__VAR_SSH_KEY,
+											   private_key=private_key)
 
-		# Open file with server instalation script.
-		with open(join(settings.PROJECT_ROOT, 'server_install.sh'), 'r') as f:
+				# Open file with server instalation script.
+				with open(join(settings.PROJECT_ROOT, 'server_install.sh'), 'r') as f:
 
-			try:
-				# Add variables to install script.
-				install_script = f.read()
-				install_script = install_script.replace('__VAR_HOSTNAME_FOR_URL', \
-														 __VAR_HOSTNAME_FOR_URL)
+					try:
+						# Add variables to install script.
+						install_script = f.read()
+						install_script = install_script.replace('__VAR_HOSTNAME_FOR_URL', \
+																 __VAR_HOSTNAME_FOR_URL)
 
-				install_script = install_script.replace('__VAR_USER', __VAR_USER)
-				install_script = install_script.replace('__VAR_SSH_KEY', __VAR_SSH_KEY)
+						install_script = install_script.replace('__VAR_USER', __VAR_USER)
+						install_script = install_script.replace('__VAR_SSH_KEY', __VAR_SSH_KEY)
 
-			except Exception, e:
-				print(e)
+					except Exception, e:
+						print(e)
 
-		return HttpResponse(install_script)
+				return HttpResponse(install_script)
+			return HttpResponse("")
 
+		except Exception, (code, e):
+			print(code, e)
+
+		finally:
+			os.system('rm %s' % private_key_path)
