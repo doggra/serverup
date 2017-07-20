@@ -44,10 +44,12 @@ else
     exit 1
 fi
 
+
 # Get environment variables
 xargs -n 1 -0 < /proc/${$}/environ | sed -n 's/^ENV_VAR_NAME=\(.*\)/\1/p'
 
-# Get ssh port
+
+# Get SSH Port
 SSHPORT=${SSH_CONNECTION##* }
 if ! [ "$SSHPORT" -eq "$SSHPORT" ] 2>/dev/null; then
     echo -e "\e[1;31mSSH port not found." 1>&2
@@ -55,6 +57,9 @@ if ! [ "$SSHPORT" -eq "$SSHPORT" ] 2>/dev/null; then
     exit 1
 fi
 echo "SSH port: ${SSHPORT}"
+
+# Get SSH IP
+SSHIP=$(echo ${SSH_CONNECTION} | awk '{print $3}')
 
 # Check for dependencies
 echo "Check for dependencies..."
@@ -123,7 +128,7 @@ fi
 
 # Callback to Django ap[]
 echo "Checking access to server..."
-OUTPUT=$(wget -q  --post-data 'u=${USER}&h=${HOSTNAME}&d=${SYSTEM}&s=${SSHPORT}' -O - "__VAR_CHECK_ACCESS_URL")
+OUTPUT=$(wget -q  --post-data 'u=${USER}&i=${SSHIP}&h=${HOSTNAME}&d=${SYSTEM}&s=${SSHPORT}' -O - "__VAR_CHECK_ACCESS_URL")
 if ! [ "$OUTPUT" == "OK" ]; then
     echo -e "\e[1;31mNo access to this server." 1>&2
     echo -e "\e[1;31mPlease try it again." 1>&2
