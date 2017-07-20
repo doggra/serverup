@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import os
 from os.path import join
+from fabric.api import run
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse, reverse_lazy
@@ -17,6 +18,7 @@ from django.views.generic.list import ListView
 
 from .models import Server, ServerGroup, PackageUpdate
 from django.contrib.auth.models import User
+
 
 @method_decorator(login_required, name='dispatch')
 class ServersControlPanelView(TemplateView):
@@ -103,7 +105,8 @@ def remove_server_group(request):
 
 def install_server(request):
 
-	__VAR_CHECK_ACCESS_URL = "http://{}/install/".format(request.get_host(),)
+	# Get hostname for URL
+	__VAR_HOSTNAME_FOR_URL = "http://{}/install/".format(request.get_host(),)
 
 	if request.method == "POST":
 		user = request.POST['u']
@@ -113,30 +116,47 @@ def install_server(request):
 		port = request.POST['s']
 		print(request.POST.items())
 
+		s = Server.objects.filter(user=user, install=True).first_or_none()
+		if s:
+			s.install = False
+
+		os.system('fab -H 127.0.0.1')
+		# Check SSH connection.
+
+
+		s.save()
 		return HttpResponse("OK")
+
 
 	elif request.method == "GET":
 		user = request.GET['u']
 		key_path = join(settings.PROJECT_ROOT, 'keys', user)
 
-		# Generate key and create server
+		# Generate key and assign them to var
 		os.system('ssh-keygen -t rsa -b 4096 -C up2secure -f {} -N ""'.format(key_path,))
-		private_key = os.system('cat {}'.format(key_path))
-		__VAR_SSH_KEY = os.system('cat {}'.format(key_path+".pub"))
+		private_key = os.popen('cat {}'.format(key_path)).read()
+		__VAR_SSH_KEY = os.popen('cat {}'.format(key_path+".pub")).read()
 		__VAR_USER = request.GET['u']
-		server = Server.objects.create(user=User.objects.get(profile__uuid=__VAR_USER), 
-															 public_key=__VAR_SSH_KEY,
-															 private_key=private_key)
 
+		user = User.objects.get(profile__uuid=__VAR_USER)
+		server = Server.objects.create(user=user, 
+									   public_key=__VAR_SSH_KEY,
+									   private_key=private_key)
+
+		# Open file with server instalation script.
 		with open(join(settings.PROJECT_ROOT, 'server_install.sh'), 'r') as f:
 
-			# Add variables to install script.
-			install_script = f.read()
-			install_script = install_script.replace('__VAR_CHECK_ACCESS_URL', \
-													 __VAR_CHECK_ACCESS_URL)
+			try:
+				# Add variables to install script.
+				install_script = f.read()
+				install_script = install_script.replace('__VAR_HOSTNAME_FOR_URL', \
+														 __VAR_HOSTNAME_FOR_URL)
 
-			install_script = install_script.replace('__VAR_USER', __VAR_USER)
-			install_script = install_script.replace('__VAR_SSH_KEY', __VAR_SSH_KEY)
+				install_script = install_script.replace('__VAR_USER', __VAR_USER)
+				install_script = install_script.replace('__VAR_SSH_KEY', __VAR_SSH_KEY)
+
+			except Exception, e:
+				print(e)
 
 		return HttpResponse(install_script)
 
