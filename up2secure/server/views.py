@@ -2,6 +2,9 @@
 from __future__ import unicode_literals
 
 import os
+import paramiko
+import StringIO
+import select
 from os.path import join
 from fabric.api import run
 from django.conf import settings
@@ -19,6 +22,7 @@ from django.views.generic.list import ListView
 from .models import Server, ServerGroup, PackageUpdate
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
+
 
 @method_decorator(login_required, name='dispatch')
 class ServersControlPanelView(TemplateView):
@@ -113,18 +117,56 @@ def install_server(request):
 		ip = request.POST['i']
 		host = request.POST['h']
 		dist = request.POST['d']
-		port = request.POST['s']
-		print(request.POST.items())
+		port = request.POST['p']
+		s_uuid = request.POST['s']
 
-		s = Server.objects.filter(user__profile__uuid=user, install=True)
-		s.update(install=False)
-		
-		# Check SSH connection.
-		print('Check SSH')
+		s = Server.objects.get(user__profile__uuid=user, uuid=s_uuid, install=True)
+		s.install = False
+		s.host = host
+
+		try:
+			s.os = int(dist)
+		except TypeError:
+			s.os = 3
+
+		try:
+			s.ssh_port = int(port)
+		except TypeError:
+			pass
 
 		s.save()
-		return HttpResponse("OK")
 
+		# Check SSH connection.
+		try:
+			s_ip = s.ip
+			priv_key = s.first().private_key
+			pkey = paramiko.RSAKey.from_private_key(StringIO.StringIO(priv_key))
+
+			ssh = paramiko.SSHClient()
+			ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+			ssh.connect(hostname=s_ip, username='root', pkey=pkey)
+
+			stdin, stdout, stderr = ssh.exec_command("uname -a")
+
+			# Wait for the command to terminate
+			# Only print data if there is data to read in the channel
+			while not stdout.channel.exit_status_ready():
+				if stdout.channel.recv_ready():
+					rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+					if len(rl) > 0:
+						print(stdout.channel.recv(1024))
+
+			ssh.close()
+
+			return HttpResponse("OK")
+
+		except paramiko.AuthenticationException:
+			print "Authentication failed when connecting to %s" % host
+			HttpResponse("FAIL")
+
+		except Exception, (code, e):
+			print "Could not SSH to %s, waiting for it to start" % host
+			HttpResponse("FAIL: ({}) {}".format(code, e))
 
 	elif request.method == "GET":
 		user = request.GET['u']
@@ -143,6 +185,8 @@ def install_server(request):
 											   public_key=__VAR_SSH_KEY,
 											   private_key=private_key)
 
+				__VAR_SERVER_UUID = server.uuid
+
 				# Open file with server instalation script.
 				with open(join(settings.PROJECT_ROOT, 'server_install.sh'), 'r') as f:
 
@@ -152,8 +196,12 @@ def install_server(request):
 						install_script = install_script.replace('__VAR_HOSTNAME_FOR_URL', \
 																 __VAR_HOSTNAME_FOR_URL)
 
+						install_script = install_script.replace('__VAR_SERVER_UUID', \
+																 __VAR_SERVER_UUID)
+
 						install_script = install_script.replace('__VAR_USER', __VAR_USER)
 						install_script = install_script.replace('__VAR_SSH_KEY', __VAR_SSH_KEY)
+
 
 					except Exception, e:
 						print(e)

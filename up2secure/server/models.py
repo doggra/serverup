@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
 
 OS_DISTRO = (
 	(0, "Debian"),
 	(1, "Centos"),
+	(2, "Ubuntu"),
+	(3, "Unknown"),
 )
 
 STATUS = (
@@ -28,14 +31,15 @@ class PackageUpdate(models.Model):
 
 
 class Server(models.Model):
+	uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 	user = models.ForeignKey(User)
 	os = models.IntegerField(null=True, choices=OS_DISTRO)
 	ip = models.GenericIPAddressField(default='127.0.0.1')
+	ssh_port = models.IntegerField(default=22)
 	hostname = models.CharField(max_length=255, blank=True)
 	status = models.IntegerField(default=0, choices=STATUS)
 	public_key = models.TextField(blank=True)
 	private_key = models.TextField(blank=True)
-	install = models.BooleanField(default=True)
 
 	@property
 	def show_status(self):

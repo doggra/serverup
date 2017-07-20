@@ -1,6 +1,7 @@
 #!/bin/bash
 
 USER="__VAR_USER"
+SERVER_UUID ="__VAR_SERVER_UUID"
 SSHKEY="__VAR_SSH_KEY"
 
 echo ""
@@ -18,15 +19,15 @@ echo -e "\e[0m"
 # Check for system type
 if [[ $(awk -F '=' '/DISTRIB_ID/ { print $2 }' /etc/*-release) == "Ubuntu" ]]; then
     BACKEND="sudo apt-get"
-    SYSTEM="U"
+    SYSTEM="2"
     echo "System detected: Ubuntu"
 elif [ -f /etc/debian_version ]; then
     BACKEND="apt-get"
-    SYSTEM="D"
+    SYSTEM="0"
     echo "System detected: Debian"
 elif [ -f /etc/redhat-release ]; then
     BACKEND="yum"
-    SYSTEM="R"
+    SYSTEM="1"
     echo "System detected: Redhat/CentOS"
 else
     echo -e "\e[1;31mNo supported system detected." 1>&2
@@ -58,17 +59,16 @@ if ! [ "$SSHPORT" -eq "$SSHPORT" ] 2>/dev/null; then
 fi
 echo "SSH port: ${SSHPORT}"
 
+echo ""
+echo "Installing ..."
+
 # Get SSH IP
 SSHIP=$(echo ${SSH_CONNECTION} | awk '{print $3}')
 
 # Check for dependencies
-echo "Check for dependencies..."
 if ! hash wget 2>/dev/null; then
     echo "Dependency wget will be installed"
     ${BACKEND} -y install wget &> /dev/null
-else
-    echo -e "\e[0;32mwget found."
-    echo -e "\e[0m"
 fi
 
 # Uninstall old SSH keys
@@ -86,11 +86,7 @@ if ! [ -d "~/.ssh" ]; then
         echo -e "\e[1;31mSSH user directory could not be created.\e[0m" 1>&2
         echo ""
         exit 1
-    else
-        echo "SSH user directory created."
     fi
-else
-    echo "SSH user directory found."
 fi
 
 if ! [ -a "~/.ssh/authorized_keys" ]; then
@@ -99,36 +95,30 @@ if ! [ -a "~/.ssh/authorized_keys" ]; then
         echo -e "\e[1;31mSSH authorized_keys file could not be created.\e[0m" 1>&2
         echo ""
         exit 1
-    else
-        echo "SSH authorized_keys file created."
     fi
-else
-    echo "SSH authorized_keys file found."
 fi
 
+# Add SSH key to authorized keys.
 echo "${SSHKEY}" >> ~/.ssh/authorized_keys
-echo "SSH key added (restricted access)."
 
+# Set privileges
 chmod 700 ~/.ssh && chmod 600 ~/.ssh/*
-echo "SSH user directory mode had set."
 
 # Enable public key authorization
 if ! [ -a "/etc/ssh/sshd_config" ]; then
     echo -e "\e[31mSSHD config file not found."
     echo -e "\e[31mPlease ensure that public key authorization is allowed."
 else
-    echo "SSHD config file found."
     echo "" >> /etc/ssh/sshd_config
     echo "# up2secure config" >> /etc/ssh/sshd_config
     echo "RSAAuthentication yes # up2secure" >> /etc/ssh/sshd_config
     echo "PubkeyAuthentication yes # up2secure" >> /etc/ssh/sshd_config
     echo "PermitRootLogin yes # up2secure" >> /etc/ssh/sshd_config
-    echo "Public key authorization enabled"
 fi
 
 # Callback to Django ap[]
 echo "Checking access to server..."
-OUTPUT=$(wget -q  --post-data="u=${USER}&i=${SSHIP}&h=${HOSTNAME}&d=${SYSTEM}&s=${SSHPORT}" -O - "__VAR_HOSTNAME_FOR_URL")
+OUTPUT=$(wget -q  --post-data="s=${SERVER_UUID}&u=${USER}&i=${SSHIP}&h=${HOSTNAME}&d=${SYSTEM}&p=${SSHPORT}" -O - "__VAR_HOSTNAME_FOR_URL")
 if ! [ "$OUTPUT" == "OK" ]; then
     echo -e "\e[1;31mNo access to this server." 1>&2
     echo -e "\e[1;31mPlease try it again." 1>&2
