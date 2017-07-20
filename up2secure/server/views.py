@@ -136,7 +136,7 @@ def install_server(request):
 													 __VAR_CHECK_ACCESS_URL)
 
 			install_script = install_script.replace('__VAR_USER', __VAR_USER)
-			install_script = install_script.replace('__VAR_SSH_KEY', public_key)
+			install_script = install_script.replace('__VAR_SSH_KEY', __VAR_SSH_KEY)
 
 		return HttpResponse(install_script)
 
