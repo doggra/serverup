@@ -136,28 +136,17 @@
           </a>
         </li>
 
-        <li class="{% block menu_server %}{% endblock %} treeview">
-          <a href="#">
+        <li class="{% block menu_server %}{% endblock %}">
+          <a href="{% url 'servers' %}">
             <i class="fa fa-server"></i> <span>Servers</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-left pull-right"></i>
-            </span>
           </a>
-          <ul class="treeview-menu">
-            <li>
-              <a href="{% url 'servers' %}">
-                <i class="fa fa-angle-right"></i> Control panel
-              </a>
-            </li>
-
-            <li class="{% block menu_updates %}{% endblock %}">
-              <a href="{% url 'updates' %}">
-                <i class="fa fa-angle-right"></i> Updates
-              </a>
-            </li>
-          </ul>
         </li>
 
+        <li class="{% block menu_updates %}{% endblock %}">
+          <a href="{% url 'updates' %}">
+            <i class="fa fa-angle-right"></i> <span>Updates</span>
+          </a>
+        </li>
 
         {% if user.profile.account_type > 0 %}
           {% if user.profile.account_type == 2 %}

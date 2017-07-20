@@ -3,7 +3,7 @@
 {% block menu_server %}active{% endblock %}
 
 {% block content %}
-<h3>Are you sure you want to delete server "{{ object.name }}"?</h3>
+<h3>Are you sure you want to delete server "{{ object.hostname }}"?</h3>
 <form method="POST">
 {% csrf_token %}
 <input type="submit" value="Yes" class="btn btn-success" />
