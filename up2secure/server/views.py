@@ -116,13 +116,11 @@ def install_server(request):
 		port = request.POST['s']
 		print(request.POST.items())
 
-		s = Server.objects.filter(user=user, install=True).first_or_none()
-		if s:
-			s.install = False
-
-		os.system('fab -H 127.0.0.1')
+		s = Server.objects.filter(user__profile__uuid=user, install=True)
+		s.update(install=False)
+		
 		# Check SSH connection.
-
+		print('Check SSH')
 
 		s.save()
 		return HttpResponse("OK")
