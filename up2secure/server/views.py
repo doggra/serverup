@@ -116,6 +116,7 @@ def install_server(request):
 		return HttpResponse("OK")
 
 	elif request.method == "GET":
+		user = request.GET['u']
 		key_path = join(settings.PROJECT_ROOT, 'keys', user)
 
 		# Generate key and create server
