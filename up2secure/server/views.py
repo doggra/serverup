@@ -18,7 +18,7 @@ from django.views.generic.list import ListView
 
 from .models import Server, ServerGroup, PackageUpdate
 from django.contrib.auth.models import User
-
+from django.views.decorators.csrf import csrf_exempt
 
 @method_decorator(login_required, name='dispatch')
 class ServersControlPanelView(TemplateView):
@@ -102,7 +102,7 @@ def remove_server_group(request):
 		group.save()
 	return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
-
+@csrf_exempt
 def install_server(request):
 
 	# Get hostname for URL
