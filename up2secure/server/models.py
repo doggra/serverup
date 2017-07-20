@@ -31,7 +31,7 @@ class PackageUpdate(models.Model):
 
 
 class Server(models.Model):
-	uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+	uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
 	user = models.ForeignKey(User)
 	os = models.IntegerField(null=True, choices=OS_DISTRO)
 	ip = models.GenericIPAddressField(default='127.0.0.1')
@@ -40,6 +40,7 @@ class Server(models.Model):
 	status = models.IntegerField(default=0, choices=STATUS)
 	public_key = models.TextField(blank=True)
 	private_key = models.TextField(blank=True)
+	install = models.BooleanField(default=True)
 
 	@property
 	def show_status(self):
