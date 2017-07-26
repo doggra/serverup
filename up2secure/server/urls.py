@@ -6,7 +6,6 @@ from .views import Servers, ServerDetails, ServerGroupView, \
 				   ServerDeleteView
 
 urlpatterns = [
-
 	url(r'^$', Servers.as_view(), name='servers'),
 
 	url(r'^details/(?P<uuid>[\w-]+)/$', ServerDetails.as_view(), name='server_details'),

@@ -13,10 +13,11 @@ OS_DISTRO = (
 )
 
 STATUS = (
-	(0, "UPDATED"),
-	(1, "PENDING"),
+	(0, "UP TO DATE"),
+	(1, "UPDATES AVAILABLE"),
 	(2, "IGNORED"),
-	(3, "ERROR")
+	(3, "INSTALL"),
+	(4, "ERROR")
 )
 
 
@@ -52,6 +53,8 @@ class Server(models.Model):
 			return "<span class='badge bg-orange'>{} PENDING UPDATES</span>"\
 																.format(count_pending_updates,)
 		elif self.status == 3:
+			return "<span class='badge bg-aqua'>INSTALL</span>"
+		elif self.status == 4:
 			return "<span class='badge bg-red'>ERROR</span>"
 
 	@property

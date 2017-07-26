@@ -31,7 +31,13 @@ class Servers(TemplateView):
 
 	def get_context_data(self, **kwargs):
 		context = super(Servers, self).get_context_data(**kwargs)
-		context['servers'] = Server.objects.filter(user=self.request.user)
+
+		# Display all servers if user is superuser
+		if self.request.user.is_staff:
+			context['servers'] = Server.objects.all()
+		else:
+			context['servers'] = Server.objects.filter(user=self.request.user)
+
 		context['updates'] = PackageUpdate.objects.filter(status=1)
 		context['server_groups'] = ServerGroup.objects.filter(user=self.request.user)
 		context['install_script'] = "wget -O - http://{}/install/?u={} | bash".format( \
