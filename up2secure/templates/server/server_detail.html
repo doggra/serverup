@@ -39,6 +39,14 @@
 				<table class="table table-bordered">
 					<tbody>
 						<tr>
+							<td>
+								UUID
+							</td>
+							<td>
+								{{ object.uuid }}
+							</td>
+						</tr>
+						<tr>
 							<td>Status</td>
 							<td>{{ object.show_status|safe }}</td>
 						</tr>
@@ -52,6 +60,10 @@
 						</tr>
 						<tr>
 							<td>IP</td>
+							<td>{{ object.ip }}</td>
+						</tr>
+						<tr>
+							<td>Port</td>
 							<td>{{ object.ip }}</td>
 						</tr>
 						{% if request.user.profile.account_type > 0 %}

@@ -142,6 +142,12 @@
           </a>
         </li>
 
+        <li class="{% block menu_updates %}{% endblock %}">
+          <a href="{% url 'updates' %}">
+            <i class="fa fa-arrow-circle-o-up"></i> <span>Updates</span>
+          </a>
+        </li>
+
         {% if user.profile.account_type > 0 %}
           {% if user.profile.account_type == 2 %}
             <li class="{% block menu_reseller %}{% endblock %}">
