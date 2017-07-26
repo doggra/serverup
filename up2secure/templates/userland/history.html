@@ -8,9 +8,19 @@
     <h1>
       History
     </h1>
-    <ol class="breadcrumb">
-      <li><a href="#"><i class="fa fa-refresh"></i> History</a></li>
-    </ol>
+	<table class="app_data">
+		<thead>
+			<th>Datetime</th>
+		</thead>
+		<tbody>
+			{% for event in events %}
+			<tr>
+				<td>{{ event.datetime }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
 {% endblock contentheader %}
 
 {% block content %}

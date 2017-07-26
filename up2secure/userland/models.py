@@ -26,7 +26,7 @@ class Customer(models.Model):
 
 
 class Profile(models.Model):
-	uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+	uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
 	user = models.OneToOneField(User)
 	credits = models.IntegerField(default=0)
 	server_limit = models.IntegerField(default=1)

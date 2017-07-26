@@ -8,9 +8,9 @@ from .views import Servers, ServerDetails, ServerGroupView, \
 
 urlpatterns = [
 	url(r'^$', Servers.as_view(), name='servers'),
-	url(r'^details/(?P<uuid>\d+)/$', ServerDetails.as_view(), name='server_details'),
-	url(r'^edit/(?P<pk>\d+)/$', ServerEditView.as_view(), name='server_edit'),
-	url(r'^delete/(?P<pk>\d+)/$', ServerDeleteView.as_view(), name='server_delete'),
+	url(r'^details/(?P<uuid>[\w-]+)/$', ServerDetails.as_view(), name='server_details'),
+	url(r'^edit/(?P<uuid>[\w-]+)/$', ServerEditView.as_view(), name='server_edit'),
+	url(r'^delete/(?P<uuid>[\w-]+)/$', ServerDeleteView.as_view(), name='server_delete'),
 	url(r'^group/(?P<pk>\d+)/$', ServerGroupView.as_view(), name='server_group'),
 	url(r'^updates/', PackageUpdateListView.as_view(), name='updates'),
 	url(r'^group/add/$', add_group, name='add_group'),

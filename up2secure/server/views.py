@@ -43,6 +43,9 @@ class Servers(TemplateView):
 class ServerDetails(DetailView):
 	model = Server
 
+	def get_object(self):
+		return get_object_or_404(Server, uuid=self.kwargs['uuid'])
+
 	def get_context_data(self, **kwargs):
 		context = super(ServerDetails, self).get_context_data(**kwargs)
 		context['available_groups'] = ServerGroup.objects.filter(user=self.request.user) \
@@ -56,6 +59,8 @@ class ServerEditView(UpdateView):
 	fields = ['ip', 'hostname']
 	template_name = "server/server_edit.html"
 
+	def get_object(self):
+		return get_object_or_404(Server, uuid=self.kwargs['uuid'])
 
 	def get_success_url(self):
 		return "{}?alert=1&updated=1".format(reverse('server_details', \
@@ -86,6 +91,9 @@ class ServerGroupDeleteView(DeleteView):
 class ServerDeleteView(DeleteView):
 	model = Server
 	success_url = reverse_lazy('servers')
+
+	def get_object(self):
+		return get_object_or_404(Server, uuid=self.kwargs['uuid'])
 
 
 @login_required

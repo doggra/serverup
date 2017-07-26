@@ -48,7 +48,7 @@
 								</thead>
 								<tbody>
 									{% for server in servers %}
-									<tr class="link" data-href="{% url 'server_details' server.pk %}">
+									<tr class="link" data-href="{% url 'server_details' server.uuid %}">
 											<td class="text-center">{{ server.show_os_icon|safe }}</td>
 											<td>{{ server.hostname }}</td>
 											<td>{{ server.ip }}</td>
@@ -67,29 +67,28 @@
 						</table>
 				</div>
 		</div>
-		{% if request.user.profile.account_type == 0 %}
-		<div class="alert alert-primary">
-			You can add new server within seconds. Just run the following command as a root user on machine you want to add.
+		<div>
+			<b>Installation script</b><br/>
+			<small>To add new server within seconds. Run the following command as a root user on machine you want to add.</small>
 			<p>&nbsp;</p>
 			<div class="input-group">
 					<input id="copyTarget" type="text" class="form-control" value="{{ install_script }}">
 					<span style="cursor:pointer;" title="Copy to clipboard!" id="copyButton" class="input-group-addon"><i class="fa fa-clipboard"></i></span>
 			</div>
 		</div>
-		{% endif %}
 	</div>
 	<div class="col-md-5">
 		<div class="box">
 				<div class="box-header">
 					<h3 class="box-title">Server Groups</h3>
 
-					<!-- <div class="box-tools">
+					<div class="box-tools">
 						<ul class="pagination pagination-sm no-margin pull-right">
 							<li><a href="#">&laquo;</a></li>
 							<li><a href="#">1</a></li>
 							<li><a href="#">&raquo;</a></li>
 						</ul>
-					</div> -->
+					</div>
 
 				</div>
 				<div class="box-body no-padding">
