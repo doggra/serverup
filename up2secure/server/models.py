@@ -16,6 +16,7 @@ STATUS = (
 	(0, "UPDATED"),
 	(1, "PENDING"),
 	(2, "IGNORED"),
+	(3, "ERROR")
 )
 
 
@@ -34,10 +35,10 @@ class Server(models.Model):
 	uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
 	user = models.ForeignKey(User)
 	os = models.IntegerField(null=True, choices=OS_DISTRO)
-	ip = models.GenericIPAddressField(default='127.0.0.1')
+	ip = models.GenericIPAddressField(default='Unknown')
 	ssh_port = models.IntegerField(default=22)
-	hostname = models.CharField(max_length=255, blank=True)
-	status = models.IntegerField(default=0, choices=STATUS)
+	hostname = models.CharField(max_length=255, default="Unknown")
+	status = models.IntegerField(default=3, choices=STATUS)
 	public_key = models.TextField(blank=True)
 	private_key = models.TextField(blank=True)
 	install = models.BooleanField(default=True)
@@ -50,6 +51,8 @@ class Server(models.Model):
 			count_pending_updates = UpdatePackage.objects.filter(server=self, status=1).count()
 			return "<span class='badge bg-orange'>{} PENDING UPDATES</span>"\
 																.format(count_pending_updates,)
+		elif self.status == 3:
+			return "<span class='badge bg-red'>ERROR</span>"
 
 	@property
 	def show_os_icon(self):

@@ -6,12 +6,10 @@
 
 {% block contentheader %}
 	<h1>
-	  Servers
-	  <small>Updates</small>
+	  Updates
 	</h1>
 	<ol class="breadcrumb">
-	  <li><a href="{% url 'servers' %}"><i class="fa fa-server"></i> Servers</a></li>
-	  <li class="active">Updates</li>
+	  <li class="active"><a href="{% url 'updates' %}"><i class="fa fa-arrow-circle-o-up"></i> Updates</a></li>
 	</ol>
 {% endblock contentheader %}
 
@@ -42,7 +40,7 @@
 					</tr>
 				{% empty %}
 					<tr>
-						<td class="text-center" colspan="2">
+						<td class="text-center" colspan="4">
 							No updates available.
 						</td>
 					</tr>

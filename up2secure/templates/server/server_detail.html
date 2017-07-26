@@ -64,7 +64,7 @@
 						</tr>
 						<tr>
 							<td>Port</td>
-							<td>{{ object.ip }}</td>
+							<td>{{ object.port }}</td>
 						</tr>
 						{% if request.user.profile.account_type > 0 %}
 						<tr>
@@ -85,7 +85,6 @@
 				<h3 class="box-title">Server groups</h3>
 			</div>
 			<div class="box-body">
-				<h4>Server is in the following groups:</h4>
 				<table class="table table-bordered table-hover">
 						<tbody>
 						{% for group in object.servergroup_set.all %}
@@ -108,7 +107,7 @@
 						{% endfor %}
 					</select>
                     <span class="input-group-btn">
-						<input type="submit" value="Assign" class="btn btn-success" />
+						<input type="submit" value="Assign" class="btn btn-primary" />
                     </span>
 	              </div>
 					
@@ -157,7 +156,7 @@
 	<div class="col-xs-12">
 		<div class="box">
 			<div class="box-header with-border">
-				<h3 class="box-title">Updates history</h3>
+				<h3 class="box-title">History</h3>
 			</div>
 			<div class="box-body">
 			No history yet.

@@ -7,7 +7,7 @@ from userland.views import Dashboard, OwnProfile, OwnProfileEdit, History, Login
 
 from django.contrib.auth import views as auth_views
 
-from server.views import install_server
+from server.views import PackageUpdateListView, install_server
 
 urlpatterns = [
 
@@ -22,9 +22,8 @@ urlpatterns = [
 	url(r'^profile/$', OwnProfile.as_view(), name='own_profile'),
 	url(r'^profile/edit/$', OwnProfileEdit.as_view(), name='own_profile_edit'),
 	url(r'^profile/password/change/$', ChangePasswordView.as_view(), name='password_change'),
-
 		
-
+	url(r'^updates/', PackageUpdateListView.as_view(), name='updates'),
 	url(r'^history/$', History.as_view(), name='history'),
 
 	# App
