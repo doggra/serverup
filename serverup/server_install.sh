@@ -1,4 +1,5 @@
 #!/bin/bash
+
 USER="__VAR_USER"
 SERVERUUID="__VAR_SERVER_UUID"
 HOSTNAME=$(hostname -f)
@@ -21,45 +22,43 @@ elif [ -f /etc/redhat-release ]; then
     BACKEND="yum"
     SYSTEM="1"
 fi
-xargs -n 1 -0 < /proc/${$}/environ | sed -n 's/^ENV_VAR_NAME=\(.*\)/\1/p'
+
 if ! [ "$SSHPORT" -eq "$SSHPORT" ] 2>/dev/null; then
     echo -e "\e[1;31mSSH port not found." 1>&2
     echo -e "\e[0m"
     exit 1
 fi
 
-if ! hash wget 2>/dev/null; then
-    ${BACKEND} -y install wget &> /dev/null
-fi
+# Install wget if not exists in system
+if ! hash wget 2>/dev/null; then ${BACKEND} -y install wget &>/dev/null; fi
 
 # Uninstall old instances
 rm /usr/local/bin/serverup-rsh &> /dev/null
 sed -i '/serverup/d' ~/.ssh/authorized_keys &> /dev/null
 sed -i '/serverup/d'/etc/ssh/sshd_config &> /dev/null
-rm /usr/local/bin/serverup-remove &> /dev/null
+rm /usr/local/bin/serverup-uninstall &> /dev/null
 
-# Copy the restricted shell
+# Copy rbash
 cat <<\EOT >> /usr/local/bin/serverup-rsh
 #!/bin/bash
-# Restricted shell of serverUP
 
 if [[ -z $SSH_ORIGINAL_COMMAND ]]
 then
-    echo "updAIX restricted shell: interactive shell not allowed"
+    echo "Pong"
     exit 1
 fi
 
 case $SSH_ORIGINAL_COMMAND in
+    "apt-get update -qq && apt-get upgrade -s" | "sudo apt-get update -qq && apt-get upgrade -s" | \
     "apt-get autoclean -y" | "sudo apt-get autoclean -y" | \
-    "apt-get update -qq" | "sudo apt-get update -qq" | \
-    "apt-get upgrade -s" | "sudo apt-get upgrade -s" | \
-    "dpkg --configure -a" | "yum check-update -q" | "/usr/local/bin/serverup-remove")
+    "dpkg --configure -a" | "yum check-update -q" | \
+    "/usr/local/bin/serverup-uninstall")
         bash -c "$SSH_ORIGINAL_COMMAND"
         ;;
     "yum update "*)
         SUBSTRING=$(echo $SSH_ORIGINAL_COMMAND | cut -c -12)
         if [[ "$SUBSTRING" =~ [^a-zA-Z0-9\-\ ] ]]; then
-            echo "updAIX restricted shell: command not allowed: $SSH_ORIGINAL_COMMAND"
+            echo "Command not allowed: $SSH_ORIGINAL_COMMAND"
             exit 2
         fi
         bash -c "$SSH_ORIGINAL_COMMAND"
@@ -67,7 +66,7 @@ case $SSH_ORIGINAL_COMMAND in
     "apt-get install --only-upgrade "*)
         SUBSTRING=$(echo $SSH_ORIGINAL_COMMAND | cut -c -32)
         if [[ "$SUBSTRING" =~ [^a-zA-Z0-9\-\ ] ]]; then
-            echo "updAIX restricted shell: command not allowed: $SSH_ORIGINAL_COMMAND"
+            echo "Command not allowed: $SSH_ORIGINAL_COMMAND"
             exit 2
         fi
         bash -c "$SSH_ORIGINAL_COMMAND"
@@ -75,13 +74,13 @@ case $SSH_ORIGINAL_COMMAND in
     "sudo apt-get install --only-upgrade "*)
         SUBSTRING=$(echo $SSH_ORIGINAL_COMMAND | cut -c -37)
         if [[ "$SUBSTRING" =~ [^a-zA-Z0-9\-\ ] ]]; then
-            echo "updAIX restricted shell: command not allowed: $SSH_ORIGINAL_COMMAND"
+            echo "Command not allowed: $SSH_ORIGINAL_COMMAND"
             exit 2
         fi
         bash -c "$SSH_ORIGINAL_COMMAND"
         ;;
     *)
-        echo "updAIX restricted shell: command not allowed: $SSH_ORIGINAL_COMMAND"
+        echo "Command not allowed: $SSH_ORIGINAL_COMMAND"
         exit 2
         ;;
 esac
@@ -90,25 +89,17 @@ chmod +x /usr/local/bin/serverup-rsh
 echo "Restricted shell installed"
 
 # Copy the uninstallation script
-cat <<\EOT >> /usr/local/bin/serverup-remove
+cat <<\EOT >> /usr/local/bin/serverup-uninstall
 #!/bin/bash
 # Deinstallation script
-
-# Enforce root
-if [ "$(id -u)" != "0" ]; then
-    echo "This script must be run as root"
-    exit 1
-fi
-
-# Deinstall routine
+if["$(id -u)"!="0"];then echo "This script must be run as root";fi
 rm /usr/local/bin/serverup-rsh &> /dev/null
-sed -i '/serverup/d' ~/.ssh/authorized_keys &> /dev/null
 sed -i '/serverup/d'/etc/ssh/sshd_config &> /dev/null
-rm /usr/local/bin/serverup-remove &> /dev/null
-
+sed -i '/serverup/d' ~/.ssh/authorized_keys &> /dev/null
+rm /usr/local/bin/serverup-uninstall &> /dev/null
 exit 1
 EOT
-chmod +x /usr/local/bin/serverup-remove
+chmod +x /usr/local/bin/serverup-uninstall
 echo "Deinstallation script copied"
 
 # Install SSH
@@ -128,11 +119,11 @@ if ! [ -a "~/.ssh/authorized_keys" ]; then
         exit 1
     fi
 fi
-echo "${SSHKEY}" >> ~/.ssh/authorized_keys
+echo "command=\"/usr/local/bin/serverup-rsh\" ${SSHKEY}" >> ~/.ssh/authorized_keys
 chmod 700 ~/.ssh && chmod 600 ~/.ssh/*
 if ! [ -a "/etc/ssh/sshd_config" ]; then
-    echo -e "\e[31mSSHD config file not found."
-    echo -e "\e[31mPlease ensure that public key authorization is allowed."
+    echo -e "\e[31m/etc/ssh/sshd_config not found."
+    echo -e "\e[31mpublic key authorization not allowed?"
 else
     echo "" >> /etc/ssh/sshd_config
     echo "# serverup config" >> /etc/ssh/sshd_config
@@ -142,17 +133,11 @@ else
 fi
 
 # Callback to Django
-echo "Checking access to server..."
 OUTPUT=$(wget -q  --post-data="s=${SERVERUUID}&u=${USER}&i=${SSHIP}&h=${HOSTNAME}&d=${SYSTEM}&p=${SSHPORT}" -O - "__VAR_HOSTNAME_FOR_URL")
 if ! [ "$OUTPUT" == "OK" ]; then
-    echo -e "\e[1;31mNo access to this server." 1>&2
-    echo -e "\e[1;31mPlease try it again." 1>&2
     echo -e "\e[0m${OUTPUT}"
     echo -e "\e[0m"
     exit 1
-else
-    echo -e "\e[0;32mAccess to server works!"
-    echo -e "\e[0m"
 fi
 
 echo -e "\e[1;32mInstallation finished\e[0m"

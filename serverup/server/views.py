@@ -152,7 +152,7 @@ def install_server(request):
 		try:
 			s.os = int(dist)
 		except TypeError:
-			s.os = 3
+			s.os = -1
 
 		try:
 			s.ssh_port = int(port)
@@ -162,38 +162,14 @@ def install_server(request):
 		# Installed.
 		s.save()
 		s.install = False
+		s.status = 0
 
 		# Check SSH connection.
-		try:
-			s_ip = s.ip
-			priv_key = s.private_key
-			pkey = paramiko.RSAKey.from_private_key(StringIO.StringIO(priv_key))
-
-			ssh = paramiko.SSHClient()
-			ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-			ssh.connect(hostname=s_ip, username='root', pkey=pkey)
-
-			stdin, stdout, stderr = ssh.exec_command("uname -a")
-
-			# Wait for the command to terminate
-			# Only print data if there is data to read in the channel
-			while not stdout.channel.exit_status_ready():
-				if stdout.channel.recv_ready():
-					rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-					if len(rl) > 0:
-						print(stdout.channel.recv(1024))
-
-			ssh.close()
-
+		response = s.check_updates()
+		if "FAIL" not in response:
 			return HttpResponse("OK")
-
-		except paramiko.AuthenticationException:
-			print "Authentication failed when connecting to %s" % host
-			return HttpResponse("FAIL")
-
-		except Exception, e:
-			print "Could not SSH to %s" % host
-			return HttpResponse("FAIL: {}".format(e))
+		else:
+			return HttpResponse(response)
 
 	elif request.method == "GET":
 		user = request.GET['u']
@@ -237,11 +213,11 @@ def install_server(request):
 
 		except Exception, e:
 			print(e)
-			return HttpResponse("")
+			HttpResponse(str(e))
 
 		finally:
 			os.system('rm %s' % private_key_path)
-			time.sleep(20)
+			time.sleep(8)
 			try:
 				if server.install == True:
 					server.detele()

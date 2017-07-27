@@ -2,14 +2,16 @@
 from __future__ import unicode_literals
 
 import uuid
+import paramiko
+import StringIO
 from django.db import models
 from django.contrib.auth.models import User
 
 OS_DISTRO = (
+	(-1, "Unknown"),
 	(0, "Debian"),
 	(1, "Centos"),
 	(2, "Ubuntu"),
-	(3, "Unknown"),
 )
 
 STATUS = (
@@ -33,7 +35,8 @@ class PackageUpdate(models.Model):
 
 
 class Server(models.Model):
-	uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+	uuid = models.UUIDField(primary_key=True, default=uuid.uuid4,
+							editable=False, unique=True)
 	user = models.ForeignKey(User)
 	os = models.IntegerField(null=True, choices=OS_DISTRO)
 	ip = models.GenericIPAddressField(default='127.1.1.1')
@@ -43,6 +46,50 @@ class Server(models.Model):
 	public_key = models.TextField(blank=True)
 	private_key = models.TextField(blank=True)
 	install = models.BooleanField(default=True)
+	last_check = models.DateTimeField(blank=True)
+
+	def send_command(self, command):
+
+		ssh = paramiko.SSHClient()
+		try:
+			pkey = paramiko.RSAKey.from_private_key(\
+										StringIO.StringIO(self.private_key))
+			ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+			ssh.connect(hostname=self.ip, username='root', pkey=pkey)
+
+			stdin, stdout, stderr = ssh.exec_command(command)
+
+			response = ""
+			while not stdout.channel.exit_status_ready():
+				if stdout.channel.recv_ready():
+					rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+					if len(rl) > 0:
+						response += str(stdout.channel.recv(1024))
+
+			return str(response)
+
+		except paramiko.AuthenticationException, e:
+			print "Authentication failed when connecting to %s %s" % self.hostname
+			return "FAIL: {}".format(e)
+
+		except Exception, e:
+			print "Could not SSH to %s" % self.hostname
+			return "FAIL: {}".format(e)
+
+		finally:
+			ssh.close()
+
+	def check_updates(self):
+		if self.os == 0:
+			cmd = "apt-get update -qq && apt-get upgrade -s"
+		elif self.os == 1:
+			print("Make it betteeeeer!")
+			cmd = "yum check-update -q"
+		elif self.os == 2:
+			cmd = "sudo apt-get update -qq && apt-get upgrade -s"
+
+		r = self.send_command(cmd)
+		print(r)
 
 	@property
 	def owner(self):
