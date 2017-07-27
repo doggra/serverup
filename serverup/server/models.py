@@ -53,11 +53,14 @@ class Server(models.Model):
 
 		ssh = paramiko.SSHClient()
 		try:
+
+			# Convert ssh key to readable by paramiko.
 			pkey = paramiko.RSAKey.from_private_key(\
 										StringIO.StringIO(self.private_key))
 			ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-			ssh.connect(hostname=self.ip, username='root', pkey=pkey)
 
+			# Make connection, send command and return response.
+			ssh.connect(hostname=self.ip, username='root', pkey=pkey)
 			stdin, stdout, stderr = ssh.exec_command(command)
 			response = stdout.channel.read()
 			return response
@@ -83,7 +86,14 @@ class Server(models.Model):
 			cmd = "sudo apt-get update -qq && apt-get upgrade -s"
 
 		r = self.send_command(cmd)
-		print(r)
+		for line in r.splitlines():
+			l = line.decode('utf-8')
+			if l.startswith("Inst"):
+				l_pieces = l.split(" ")
+				pkg_name = l_pieces[1]
+				pkg_ver = l_pieces[2].strip("[]")
+				pkg, crt = Package.objects.get_or_create(name=pkg_name)
+				PackageUpdate.objects.create(server=self, package=pkg, version=pkg_ver)
 
 	@property
 	def owner(self):
