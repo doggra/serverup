@@ -47,7 +47,7 @@ class Server(models.Model):
 	public_key = models.TextField(blank=True)
 	private_key = models.TextField(blank=True)
 	install = models.BooleanField(default=True)
-	last_check = models.DateTimeField(blank=True)
+	last_check = models.DateTimeField(null=True, blank=True)
 
 	def send_command(self, command):
 
