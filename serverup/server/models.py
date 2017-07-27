@@ -61,7 +61,8 @@ class Server(models.Model):
 			# Make connection, send command and return response.
 			ssh.connect(hostname=self.ip, username='root', pkey=pkey)
 			stdin, stdout, stderr = ssh.exec_command(command)
-			response = stdout.channel.read()
+			response = stdout.read()
+			return response
 
 		except paramiko.AuthenticationException, e:
 			print "Authentication failed when connecting to %s %s" % self.hostname
@@ -73,7 +74,6 @@ class Server(models.Model):
 
 		finally:
 			ssh.close()
-			return response
 
 	def check_updates(self):
 		if self.os == 0:
