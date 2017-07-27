@@ -11,11 +11,9 @@
 {% block contentheader %}
 		<h1>
 			Servers
-			<small>Control panel</small>
 		</h1>
 		<ol class="breadcrumb">
 			<li><a href="#"><i class="fa fa-server"></i> Servers</a></li>
-			<li class="active">Control panel</li>
 		</ol>
 {% endblock contentheader %}
 
@@ -43,6 +41,9 @@
 										<th class="text-center" style="width: 40px;">OS</th>
 										<th>Hostname</th>
 										<th>IP Address</th>
+										{% if request.user.profile.account_type > 0 %}
+										<th>Owner</th>
+										{% endif %}
 										<th class="text-center">Status</th>
 									</tr>
 								</thead>
@@ -52,6 +53,9 @@
 											<td class="text-center">{{ server.show_os_icon|safe }}</td>
 											<td>{{ server.hostname }}</td>
 											<td>{{ server.ip }}</td>
+											{% if request.user.profile.account_type > 0 %}
+											<td>{{ server.owner }}</td>
+											{% endif %}
 											<td class="text-center">
 												{{ server.show_status|safe }}
 											</td>
@@ -67,6 +71,12 @@
 						</table>
 				</div>
 		</div>
+		{% if request.user.profile.can_add_server %}
+		Limit ({{ request.user.server_set.count }} / {{ request.user.profile.server_limit }})
+		{% else %}
+		Servers limit reached!
+		{% endif %}
+		{% if request.user.profile.can_add_server %}
 		<div>
 			<b>Installation script</b><br/>
 			<small>To add new server within seconds run the following command as a root user on machine you want to add.</small>
@@ -75,6 +85,7 @@
 					<span style="cursor:pointer;" title="Copy to clipboard!" id="copyButton" class="input-group-addon"><i class="fa fa-clipboard"></i></span>
 			</div>
 		</div>
+		{% endif %}
 	</div>
 	<div class="col-md-5">
 		<div class="box">

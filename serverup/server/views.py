@@ -37,7 +37,7 @@ class Servers(TemplateView):
 			context['servers'] = Server.objects.all()
 		else:
 			context['servers'] = Server.objects.filter(user=self.request.user)
-
+		context['server_limit'] = self.request.user.profile.server_limit
 		context['updates'] = PackageUpdate.objects.filter(status=1)
 		context['server_groups'] = ServerGroup.objects.filter(user=self.request.user)
 		context['install_script'] = "wget -O - http://{}/install/?u={} | bash".format( \
@@ -128,12 +128,18 @@ def remove_server_group(request):
 		group.save()
 	return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
+
 @csrf_exempt
 def install_server(request):
 
-	# Get hostname for URL
+	# Check if user didn't exceed servers limit.
+	if not request.user.can_add_server():
+		return HttpResponse("Forbidden")
+
+	# Get apps hostname.
 	__VAR_HOSTNAME_FOR_URL = "http://{}/install/".format(request.get_host(),)
 
+	# Response from installation script.
 	if request.method == "POST":
 		user = request.POST['u']
 		ip = request.POST['i']
@@ -141,11 +147,9 @@ def install_server(request):
 		dist = request.POST['d']
 		port = request.POST['p']
 		s_uuid = request.POST['s']
-		print(request.POST.items())
 
+		# Get Server.
 		s = Server.objects.get(user__profile__uuid=user, uuid=s_uuid)
-
-		# Set variables
 		s.hostname = host
 		s.ip = ip
 
@@ -160,8 +164,8 @@ def install_server(request):
 			pass
 
 		# Installed.
-		s.install = False
 		s.save()
+		s.install = False
 
 		# Check SSH connection.
 		try:
@@ -193,7 +197,6 @@ def install_server(request):
 
 		except Exception, e:
 			print "Could not SSH to %s" % host
-			print(e)
 			return HttpResponse("FAIL: {}".format(e))
 
 	elif request.method == "GET":
@@ -202,7 +205,7 @@ def install_server(request):
 
 		try:
 			# Generate ssh key and assign it to var
-			os.system('ssh-keygen -t rsa -b 4096 -C up2secure -f {} -N ""'.format(private_key_path,))
+			os.system('ssh-keygen -t rsa -b 4096 -C serverup -f {} -N ""'.format(private_key_path,))
 			private_key = os.popen('cat {}'.format(private_key_path)).read()
 			__VAR_SSH_KEY = os.popen('cat {}'.format(private_key_path+".pub")).read()
 			__VAR_USER = str(request.GET.get('u', ''))
@@ -218,8 +221,8 @@ def install_server(request):
 				# Open file with server instalation script.
 				with open(join(settings.PROJECT_ROOT, 'server_install.sh'), 'r') as f:
 
+					# Substitute variables in installation script.
 					try:
-						# Add variables to install script.
 						install_script = f.read()
 						install_script = install_script.replace('__VAR_HOSTNAME_FOR_URL', \
 																 __VAR_HOSTNAME_FOR_URL)
@@ -242,7 +245,7 @@ def install_server(request):
 
 		finally:
 			os.system('rm %s' % private_key_path)
-			time.sleep(5)
+			time.sleep(20)
 			try:
 				if server.install == True:
 					server.detele()

@@ -36,13 +36,17 @@ class Server(models.Model):
 	uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
 	user = models.ForeignKey(User)
 	os = models.IntegerField(null=True, choices=OS_DISTRO)
-	ip = models.GenericIPAddressField(default='Unknown')
+	ip = models.GenericIPAddressField(default='127.1.1.1')
 	ssh_port = models.IntegerField(default=22)
 	hostname = models.CharField(max_length=255, default="Unknown")
 	status = models.IntegerField(default=3, choices=STATUS)
 	public_key = models.TextField(blank=True)
 	private_key = models.TextField(blank=True)
 	install = models.BooleanField(default=True)
+
+	@property
+	def owner(self):
+		return self.user.username
 
 	@property
 	def show_status(self):

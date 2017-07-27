@@ -9,9 +9,9 @@ ALLOWED_HOSTS = ['*']
 ### ADMINS CONFIG ###############################
 
 
-admin.site.site_header = 'Up2Secure'
-admin.site.site_title = 'Up2Secure'
-admin.site.index_title = 'Up2Secure'
+admin.site.site_header = 'ServerUP'
+admin.site.site_title = 'ServerUP'
+admin.site.index_title = 'ServerUP'
 
 
 ADMINS = (
