@@ -5,7 +5,6 @@ import time
 import os
 import paramiko
 import StringIO
-import select
 from os.path import join
 from fabric.api import run
 from django.conf import settings

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import uuid
 import paramiko
+import select
 import StringIO
 from django.db import models
 from django.contrib.auth.models import User
@@ -58,15 +59,8 @@ class Server(models.Model):
 			ssh.connect(hostname=self.ip, username='root', pkey=pkey)
 
 			stdin, stdout, stderr = ssh.exec_command(command)
-
-			response = ""
-			while not stdout.channel.exit_status_ready():
-				if stdout.channel.recv_ready():
-					rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-					if len(rl) > 0:
-						response += str(stdout.channel.recv(1024))
-
-			return str(response)
+			response = stdout.channel.read()
+			return response
 
 		except paramiko.AuthenticationException, e:
 			print "Authentication failed when connecting to %s %s" % self.hostname
