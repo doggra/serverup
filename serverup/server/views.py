@@ -132,10 +132,6 @@ def remove_server_group(request):
 @csrf_exempt
 def install_server(request):
 
-	# Check if user didn't exceed servers limit.
-	if not request.user.can_add_server():
-		return HttpResponse("Forbidden")
-
 	# Get apps hostname.
 	__VAR_HOSTNAME_FOR_URL = "http://{}/install/".format(request.get_host(),)
 
@@ -148,8 +144,8 @@ def install_server(request):
 		port = request.POST['p']
 		s_uuid = request.POST['s']
 
-		# Get Server.
-		s = Server.objects.get(user__profile__uuid=user, uuid=s_uuid)
+		# Get Server or 404
+		s = get_object_or_404(Server, user__profile__uuid=user, uuid=s_uuid)
 		s.hostname = host
 		s.ip = ip
 
