@@ -53,7 +53,6 @@ class Server(models.Model):
 
 		ssh = paramiko.SSHClient()
 		try:
-
 			# Convert ssh key to readable by paramiko.
 			pkey = paramiko.RSAKey.from_private_key(\
 										StringIO.StringIO(self.private_key))
@@ -63,7 +62,6 @@ class Server(models.Model):
 			ssh.connect(hostname=self.ip, username='root', pkey=pkey)
 			stdin, stdout, stderr = ssh.exec_command(command)
 			response = stdout.channel.read()
-			return response
 
 		except paramiko.AuthenticationException, e:
 			print "Authentication failed when connecting to %s %s" % self.hostname
@@ -75,6 +73,7 @@ class Server(models.Model):
 
 		finally:
 			ssh.close()
+			return response
 
 	def check_updates(self):
 		if self.os == 0:
@@ -86,14 +85,22 @@ class Server(models.Model):
 			cmd = "sudo apt-get update -qq && apt-get upgrade -s"
 
 		r = self.send_command(cmd)
-		for line in r.splitlines():
-			l = line.decode('utf-8')
-			if l.startswith("Inst"):
-				l_pieces = l.split(" ")
-				pkg_name = l_pieces[1]
-				pkg_ver = l_pieces[2].strip("[]")
-				pkg, crt = Package.objects.get_or_create(name=pkg_name)
-				PackageUpdate.objects.create(server=self, package=pkg, version=pkg_ver)
+
+		if "FAIL" in r:
+			return r
+		else:
+			for line in r.splitlines():
+				try:
+					l = line.decode('utf-8')
+					if l.startswith("Inst"):
+						l_pieces = l.split(" ")
+						pkg_name = l_pieces[1]
+						pkg_ver = l_pieces[2].strip("[]")
+						pkg, crt = Package.objects.get_or_create(name=pkg_name)
+						PackageUpdate.objects.create(server=self, package=pkg, version=pkg_ver)
+				except Exception, e:
+					return str(e)
+			return "OK"
 
 	@property
 	def owner(self):
