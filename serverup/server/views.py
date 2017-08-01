@@ -160,7 +160,6 @@ def install_server(request):
 
 		# Installed.
 		s.save()
-		s.install = False
 		s.status = 0
 
 		# Check SSH connection.
@@ -216,9 +215,9 @@ def install_server(request):
 
 		finally:
 			os.system('rm %s' % private_key_path)
-			time.sleep(8)
+			time.sleep(20)
 			try:
 				if server.install == True:
-					server.detele()
+					server.delete()
 			except:
 				pass

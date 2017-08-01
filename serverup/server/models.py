@@ -58,7 +58,6 @@ class Server(models.Model):
 	status = models.IntegerField(default=3, choices=STATUS)
 	public_key = models.TextField(blank=True)
 	private_key = models.TextField(blank=True)
-	install = models.BooleanField(default=True)
 	last_check = models.DateTimeField(null=True, blank=True)
 
 	def send_command(self, command):

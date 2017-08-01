@@ -8,8 +8,7 @@ SSHIP=$(echo ${SSH_CONNECTION} | awk '{print $3}')
 SSHKEY="__VAR_SSH_KEY"
 
 if [ "$(id -u)" != "0" ]; then
-    echo -e "\e[1;31mThis script must be run as root." 1>&2
-    echo -e "\e[0m"
+    echo -e "This script must be run as root." 1>&2
     exit 1
 fi
 if [[ $(awk -F '=' '/DISTRIB_ID/ { print $2 }' /etc/*-release) == "Ubuntu" ]]; then
@@ -24,21 +23,20 @@ elif [ -f /etc/redhat-release ]; then
 fi
 
 if ! [ "$SSHPORT" -eq "$SSHPORT" ] 2>/dev/null; then
-    echo -e "\e[1;31mSSH port not found." 1>&2
-    echo -e "\e[0m"
+    echo -e "SSH port not found." 1>&2
     exit 1
 fi
 
-# Install wget if not exists in system
+# Install wget if not exists
 if ! hash wget 2>/dev/null; then ${BACKEND} -y install wget &>/dev/null; fi
 
-# Uninstall old instances
+echo "Uninstalling old instances if exists..."
 rm /usr/local/bin/serverup-rsh &> /dev/null
 sed -i '/serverup/d' ~/.ssh/authorized_keys &> /dev/null
 sed -i '/serverup/d'/etc/ssh/sshd_config &> /dev/null
 rm /usr/local/bin/serverup-uninstall &> /dev/null
 
-# Copy rbash
+echo "Installing restricted shell..."
 cat <<\EOT >> /usr/local/bin/serverup-rsh
 #!/bin/bash
 
@@ -86,9 +84,8 @@ case $SSH_ORIGINAL_COMMAND in
 esac
 EOT
 chmod +x /usr/local/bin/serverup-rsh
-echo "Restricted shell installed"
 
-# Copy the uninstallation script
+echo "Copying uninstallation script..."
 cat <<\EOT >> /usr/local/bin/serverup-uninstall
 #!/bin/bash
 # Deinstallation script
@@ -100,9 +97,8 @@ rm /usr/local/bin/serverup-uninstall &> /dev/null
 exit 1
 EOT
 chmod +x /usr/local/bin/serverup-uninstall
-echo "Deinstallation script copied"
 
-# Install SSH
+echo "Installing SSH access..."
 if ! [ -d "~/.ssh" ]; then
     mkdir -p ~/.ssh
     if [ $? -ne 0 ] ; then
@@ -119,6 +115,7 @@ if ! [ -a "~/.ssh/authorized_keys" ]; then
         exit 1
     fi
 fi
+
 echo "command=\"/usr/local/bin/serverup-rsh\" ${SSHKEY}" >> ~/.ssh/authorized_keys
 chmod 700 ~/.ssh && chmod 600 ~/.ssh/*
 if ! [ -a "/etc/ssh/sshd_config" ]; then
@@ -132,7 +129,7 @@ else
     echo "PermitRootLogin yes # serverup" >> /etc/ssh/sshd_config
 fi
 
-# Callback to Django
+echo "Checking connection to control app..."
 OUTPUT=$(wget -q  --post-data="s=${SERVERUUID}&u=${USER}&i=${SSHIP}&h=${HOSTNAME}&d=${SYSTEM}&p=${SSHPORT}" -O - "__VAR_HOSTNAME_FOR_URL")
 if ! [ "$OUTPUT" == "OK" ]; then
     echo -e "\e[0m${OUTPUT}"
@@ -140,6 +137,5 @@ if ! [ "$OUTPUT" == "OK" ]; then
     exit 1
 fi
 
-echo -e "\e[1;32mInstallation finished\e[0m"
-echo ""
+echo -e "Installation finished!"
 

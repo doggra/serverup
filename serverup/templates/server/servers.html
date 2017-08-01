@@ -41,9 +41,6 @@
 										<th class="text-center" style="width: 40px;">OS</th>
 										<th>Hostname</th>
 										<th>IP Address</th>
-										{% if request.user.profile.account_type > 0 %}
-										<th>Owner</th>
-										{% endif %}
 										<th class="text-center">Status</th>
 									</tr>
 								</thead>
@@ -53,15 +50,11 @@
 											<td class="text-center">{{ server.show_os_icon|safe }}</td>
 											<td>{{ server.hostname }}</td>
 											<td>{{ server.ip }}</td>
-											<td class="text-center">
-												{{ server.show_status|safe }}
-											</td>
+											<td class="text-center">{{ server.show_status|safe }}</td>
 									</tr>
 									{% empty %}
 									<tr>
-										<td class="text-center" colspan="4">
-											No servers
-										</td>
+										<td class="text-center" colspan="4">No servers</td>
 									</tr>
 									{% endfor %}
 								</tbody>
