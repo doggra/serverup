@@ -23,16 +23,28 @@ STATUS = (
 	(4, "ERROR")
 )
 
+UPDATE_STATUS = (
+	(0, "PENDING"),
+	(1, "UPDATED"),
+	(2, "IGNORED"),
+)
+
 
 class Package(models.Model):
 	name = models.CharField(max_length=255)
+
+	def __unicode__(self):
+		return "{}".format(self.package.name,)
 
 
 class PackageUpdate(models.Model):
 	server = models.ForeignKey('Server', on_delete=models.CASCADE)
 	package = models.ForeignKey(Package)
 	version = models.CharField(max_length=255, blank=True)
-	status = models.IntegerField(default=1, choices=STATUS)
+	status = models.IntegerField(default=0, choices=UPDATE_STATUS)
+
+	def __unicode__(self):
+		return "{} [{}]".format(self.package.name, self.version)
 
 
 class Server(models.Model):
@@ -65,7 +77,7 @@ class Server(models.Model):
 			return response
 
 		except paramiko.AuthenticationException, e:
-			print "Authentication failed when connecting to %s %s" % self.hostname
+			print "Authentication failed when connecting to %s" % self.hostname
 			return "FAIL: {}".format(e)
 
 		except Exception, e:
@@ -86,8 +98,8 @@ class Server(models.Model):
 
 		r = self.send_command(cmd)
 
-		if "FAIL" in r:
-			return r
+		if "FAIL" in r.decode('utf-8'):
+			return r.decode('utf-8')
 		else:
 			for line in r.splitlines():
 				try:
@@ -97,7 +109,9 @@ class Server(models.Model):
 						pkg_name = l_pieces[1]
 						pkg_ver = l_pieces[2].strip("[]")
 						pkg, crt = Package.objects.get_or_create(name=pkg_name)
-						PackageUpdate.objects.create(server=self, package=pkg, version=pkg_ver)
+						PackageUpdate.objects.create(server=self,
+													 package=pkg,
+													 version=pkg_ver)
 				except Exception, e:
 					return str(e)
 			return "OK"
@@ -111,9 +125,12 @@ class Server(models.Model):
 		if self.status == 0:
 			return "<span class='badge bg-green'>UPDATED</span>"
 		elif self.status == 1:
-			count_pending_updates = UpdatePackage.objects.filter(server=self, status=1).count()
-			return "<span class='badge bg-orange'>{} PENDING UPDATES</span>"\
-																.format(count_pending_updates,)
+			count_pending_updates = UpdatePackage.objects.filter(server=self,
+																 status=1)\
+														 .count()
+
+			return "<span class='badge bg-orange'>{} UPDATES</span>"\
+												.format(count_pending_updates,)
 		elif self.status == 3:
 			return "<span class='badge bg-aqua'>INSTALL</span>"
 		elif self.status == 4:
