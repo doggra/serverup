@@ -33,9 +33,9 @@ class Servers(TemplateView):
 
 		# Display all servers if user is superuser
 		if self.request.user.is_staff:
-			context['servers'] = Server.objects.all()
+			context['servers'] = Server.objects.exclude(status=3)
 		else:
-			context['servers'] = Server.objects.filter(user=self.request.user)
+			context['servers'] = Server.objects.filter(user=self.request.user).exclude(status=3)
 		context['server_limit'] = self.request.user.profile.server_limit
 		context['updates'] = PackageUpdate.objects.filter(status=1)
 		context['server_groups'] = ServerGroup.objects.filter(user=self.request.user)
