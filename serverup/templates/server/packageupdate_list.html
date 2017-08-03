@@ -24,7 +24,7 @@
 			<table id="servers" class="table table-hover">
 				<thead>
 				  <tr>
-					<th>Date & time</th>
+					<th>Reported</th>
 					<th>Server</th>
 					<th>Package</th>
 					<th>Version</th>
@@ -35,7 +35,7 @@
 				{% for update in object_list %}
 					<tr>
 						<td>{{ update.datetime }}</td>
-						<td>{{ update.server }}</td>
+						<td>{{ update.server.hostname }}</td>
 						<td>{{ update.package }}</td>
 						<td>{{ update.version }}</td>
 						<td>
