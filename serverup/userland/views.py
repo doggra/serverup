@@ -28,11 +28,13 @@ class Dashboard(TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super(Dashboard, self).get_context_data(**kwargs)
 		if self.request.user.profile.account_type == 0:
-			servers = Server.objects.filter(user=self.request.user)
+			servers = Server.objects.filter(user=self.request.user).exclude(status=3)
 		elif self.request.user.profile.account_type == 1:
 			servers = Server.objects.filter(user__customer__reseller=self.request.user)
 		elif self.request.user.profile.account_type == 2:
 			servers = Server.objects.all()
+
+		servers = servers.exclude(status=3)
 
 		context['servers_count'] = servers.count()
 		context['available_updates'] = PackageUpdate.objects.filter(server__in=servers).count()

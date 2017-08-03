@@ -11,10 +11,8 @@ if [ "$(id -u)" != "0" ]; then
     echo -e "This script must be run as root." 1>&2
     exit 1
 fi
-if [[ $(awk -F '=' '/DISTRIB_ID/ { print $2 }' /etc/*-release) == "Ubuntu" ]]; then
-    BACKEND="sudo apt-get"
-    SYSTEM="2"
-elif [ -f /etc/debian_version ]; then
+
+if [ -f /etc/debian_version ]; then
     BACKEND="apt-get"
     SYSTEM="0"
 elif [ -f /etc/redhat-release ]; then
@@ -23,7 +21,7 @@ elif [ -f /etc/redhat-release ]; then
 fi
 
 if ! [ "$SSHPORT" -eq "$SSHPORT" ] 2>/dev/null; then
-    echo -e "SSH port not found." 1>&2
+    echo -e "SSH port not found!" 1>&2
     exit 1
 fi
 
@@ -33,7 +31,7 @@ if ! hash wget 2>/dev/null; then ${BACKEND} -y install wget &>/dev/null; fi
 echo "Uninstalling old instances if exists..."
 rm /usr/local/bin/serverup-rsh &> /dev/null
 sed -i '/serverup/d' ~/.ssh/authorized_keys &> /dev/null
-sed -i '/serverup/d'/etc/ssh/sshd_config &> /dev/null
+sed -i '/serverup/d' /etc/ssh/sshd_config &> /dev/null
 rm /usr/local/bin/serverup-uninstall &> /dev/null
 
 echo "Installing restricted shell..."

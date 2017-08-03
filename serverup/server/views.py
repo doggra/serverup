@@ -160,8 +160,8 @@ def install_server(request):
 			pass
 
 		# Installed.
-		s.save()
 		s.status = 0
+		s.save()
 
 		# Check SSH connection.
 		response = s.check_updates()
