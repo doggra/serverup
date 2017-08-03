@@ -28,7 +28,7 @@
 					<th>Server</th>
 					<th>Package</th>
 					<th>Version</th>
-					<th>Status</th>
+					<th>Action</th>
 				  </tr>
 				</thead>
 				<tbody>
@@ -38,7 +38,15 @@
 						<td>{{ update.server }}</td>
 						<td>{{ update.package }}</td>
 						<td>{{ update.version }}</td>
-						<td>{{ update.show_status|safe }}</td>
+						<td>
+						<div class="onoffswitch">
+							<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="switch_{{ update.pk }}" checked>
+							<label class="onoffswitch-label" for="switch_{{ update.pk }}">
+								<span class="onoffswitch-inner"></span>
+								<span class="onoffswitch-switch"></span>
+							</label>
+						</div>
+						</td>
 					</tr>
 				{% empty %}
 					<tr>
