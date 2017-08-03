@@ -102,7 +102,7 @@ echo "Installing SSH access..."
 if ! [ -d "~/.ssh" ]; then
     mkdir -p ~/.ssh
     if [ $? -ne 0 ] ; then
-        echo -e "\e[1;31mSSH user directory could not be created.\e[0m" 1>&2
+        echo -e "Can't create SSH directory." 1>&2
         echo ""
         exit 1
     fi
@@ -110,7 +110,7 @@ fi
 if ! [ -a "~/.ssh/authorized_keys" ]; then
     touch ~/.ssh/authorized_keys
     if [ $? -ne 0 ] ; then
-        echo -e "\e[1;31mSSH authorized_keys file could not be created.\e[0m" 1>&2
+        echo -e "Couldn't create SSH authorized_keys file could not be created." 1>&2
         echo ""
         exit 1
     fi

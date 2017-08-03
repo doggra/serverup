@@ -53,6 +53,7 @@ class ServerDetails(DetailView):
 
 	def get_context_data(self, **kwargs):
 		context = super(ServerDetails, self).get_context_data(**kwargs)
+		context['updates'] = PackageUpdate.objects.filter(server=self.object,status__in=[0, 2])
 		context['available_groups'] = ServerGroup.objects.filter(user=self.request.user) \
 														 .exclude(servers=self.object)
 		return context
@@ -211,13 +212,6 @@ def install_server(request):
 
 		except Exception, e:
 			print(e)
-			HttpResponse(str(e))
 
 		finally:
 			os.system('rm %s' % private_key_path)
-			time.sleep(20)
-			try:
-				if server.install == True:
-					server.delete()
-			except:
-				pass

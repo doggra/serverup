@@ -28,6 +28,7 @@
 					<th>Server</th>
 					<th>Package</th>
 					<th>Version</th>
+					<th>Status</th>
 				  </tr>
 				</thead>
 				<tbody>
@@ -37,10 +38,11 @@
 						<td>{{ update.server }}</td>
 						<td>{{ update.package }}</td>
 						<td>{{ update.version }}</td>
+						<td>{{ update.show_status|safe }}</td>
 					</tr>
 				{% empty %}
 					<tr>
-						<td class="text-center" colspan="4">
+						<td class="text-center" colspan="5">
 							No updates available.
 						</td>
 					</tr>

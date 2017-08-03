@@ -62,11 +62,6 @@
 				</div>
 		</div>
 		{% if request.user.profile.can_add_server %}
-		Limit ({{ request.user.server_set.count }} / {{ request.user.profile.server_limit }})
-		{% else %}
-		Servers limit reached!
-		{% endif %}
-		{% if request.user.profile.can_add_server %}
 		<div>
 			<b>Installation script</b><br/>
 			<small>To add new server within seconds run the following command as a root user on machine you want to add.</small>
@@ -75,6 +70,8 @@
 					<span style="cursor:pointer;" title="Copy to clipboard!" id="copyButton" class="input-group-addon"><i class="fa fa-clipboard"></i></span>
 			</div>
 		</div>
+		{% else %}
+			You can't add more servers. Probably servers limit reached?
 		{% endif %}
 	</div>
 	<div class="col-md-5">

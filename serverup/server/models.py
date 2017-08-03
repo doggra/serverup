@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import time
 import uuid
 import paramiko
 import select
 import StringIO
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+
 
 OS_DISTRO = (
 	(-1, "Unknown"),
@@ -34,10 +37,11 @@ class Package(models.Model):
 	name = models.CharField(max_length=255)
 
 	def __unicode__(self):
-		return "{}".format(self.package.name,)
+		return "{}".format(self.name,)
 
 
 class PackageUpdate(models.Model):
+	datetime = models.DateTimeField(auto_now_add=True)
 	server = models.ForeignKey('Server', on_delete=models.CASCADE)
 	package = models.ForeignKey(Package)
 	version = models.CharField(max_length=255, blank=True)
@@ -45,6 +49,15 @@ class PackageUpdate(models.Model):
 
 	def __unicode__(self):
 		return "{} [{}]".format(self.package.name, self.version)
+
+	@property
+	def show_status(self):
+		if self.status == 0:
+			return "<span class='badge bg-orange'>PENDING</span>"
+		elif self.status == 1:
+			return "<span class='badge bg-green'>UPDATED</span>"
+		elif self.status == 2:
+			return "<span class='badge bg-red'>IGNORED</span>"
 
 
 class Server(models.Model):

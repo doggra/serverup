@@ -18,7 +18,7 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Customer, Reseller
 from .forms import OwnProfileEditForm
-from server.models import Server
+from server.models import Server, PackageUpdate
 
 
 @method_decorator(login_required, name='dispatch')
@@ -28,11 +28,14 @@ class Dashboard(TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super(Dashboard, self).get_context_data(**kwargs)
 		if self.request.user.profile.account_type == 0:
-			context['servers_count'] = Server.objects.filter(user=self.request.user).count()
+			servers = Server.objects.filter(user=self.request.user)
 		elif self.request.user.profile.account_type == 1:
-			context['servers_count'] = Server.objects.filter(user__customer__reseller=self.request.user).count()
+			servers = Server.objects.filter(user__customer__reseller=self.request.user)
 		elif self.request.user.profile.account_type == 2:
-			context['servers_count'] = Server.objects.count()
+			servers = Server.objects.all()
+
+		context['servers_count'] = servers.count()
+		context['available_updates'] = PackageUpdate.objects.filter(server__in=servers).count()
 		return context
 
 @method_decorator(login_required, name='dispatch')
