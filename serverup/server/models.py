@@ -136,9 +136,10 @@ class Server(models.Model):
 			# Save package update in DB.
 			if package and version:
 				pkg, crt = Package.objects.get_or_create(name=package)
-				pkg_upt =PackageUpdate.objects.create(server=self,
-													  package=pkg,
-													  version=version)
+				pkg_upt, crt = PackageUpdate.objects\
+												.get_or_create(server=self,
+															   package=pkg,
+															   version=version)
 				pkg_pack.append(pkg_upt)
 
 		# Update status and check datetime.
