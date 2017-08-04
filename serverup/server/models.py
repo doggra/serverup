@@ -104,16 +104,17 @@ class Server(models.Model):
 
 		finally:
 			ssh.close()
+
 	def update(self):
-		to_update = " ".join(list(PackageUpdate.objects
-											   .filter(server=self,
-													   ignore=False)
-											   .values_list('package__name',
-															flat=True)))
+		""" Function for updating all non-ignored packages """
+		query = PackageUpdate.objects.filter(server=self,ignore=False)
+		to_update = " ".join(list(query.values_list('package__name',
+													flat=True)))
 
 		cmd = "apt-get install --only-upgrade {}".format(to_update,)
 		r = self.send_command(cmd)
 		print(r)
+		query.delete()
 
 	def check_updates(self):
 		if self.os == 0:
