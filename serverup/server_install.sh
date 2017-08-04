@@ -130,8 +130,7 @@ fi
 echo "Checking connection to control app..."
 OUTPUT=$(wget -q  --post-data="s=${SERVERUUID}&u=${USER}&i=${SSHIP}&h=${HOSTNAME}&d=${SYSTEM}&p=${SSHPORT}" -O - "__VAR_HOSTNAME_FOR_URL")
 if ! [ "$OUTPUT" == "OK" ]; then
-    echo -e "\e[0m${OUTPUT}"
-    echo -e "\e[0m"
+    echo -e "${OUTPUT}"
     exit 1
 fi
 

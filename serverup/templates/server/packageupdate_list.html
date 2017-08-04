@@ -40,7 +40,7 @@
 						<td>{{ update.version }}</td>
 						<td>
 						<div class="onoffswitch">
-							<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="switch_{{ update.pk }}" checked>
+							<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="switch_{{ update.pk }}" {{ update.check_ignore }}>
 							<label class="onoffswitch-label" for="switch_{{ update.pk }}">
 								<span class="onoffswitch-inner"></span>
 								<span class="onoffswitch-switch"></span>

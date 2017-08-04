@@ -15,7 +15,6 @@ OS_DISTRO = (
 	(-1, "Unknown"),
 	(0, "Debian"),
 	(1, "Centos"),
-	(2, "Ubuntu"),
 )
 
 STATUS = (
@@ -45,10 +44,15 @@ class PackageUpdate(models.Model):
 	server = models.ForeignKey('Server', on_delete=models.CASCADE)
 	package = models.ForeignKey(Package)
 	version = models.CharField(max_length=255, blank=True)
-	status = models.IntegerField(default=0, choices=UPDATE_STATUS)
+	ignore = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return "{} [{}]".format(self.package.name, self.version)
+
+	@property
+	def check_ignore(self):
+		""" Return checked to HTML input (checkbox) """
+		return "checked" if not self.ignore else ""
 
 	@property
 	def show_status(self):
@@ -103,30 +107,23 @@ class Server(models.Model):
 		if self.os == 0:
 			cmd = "apt-get update -qq && apt-get upgrade -s"
 		elif self.os == 1:
-			print("Make it betteeeeer!")
 			cmd = "yum check-update -q"
-		elif self.os == 2:
-			cmd = "sudo apt-get update -qq && apt-get upgrade -s"
 
 		r = self.send_command(cmd)
+		print(r)
+		# Add packages update objects to DB.
+		for line in r.splitlines():
+			l = line.decode('utf-8')
+			if l.startswith("Inst"):
+				l_pieces = l.split(" ")
+				pkg_name = l_pieces[1]
+				pkg_ver = l_pieces[2].strip("[]")
+				pkg, crt = Package.objects.get_or_create(name=pkg_name)
+				PackageUpdate.objects.create(server=self,
+											 package=pkg,
+											 version=pkg_ver)
 
-		if "FAIL" in r.decode('utf-8'):
-			return r.decode('utf-8')
-		else:
-			for line in r.splitlines():
-				try:
-					l = line.decode('utf-8')
-					if l.startswith("Inst"):
-						l_pieces = l.split(" ")
-						pkg_name = l_pieces[1]
-						pkg_ver = l_pieces[2].strip("[]")
-						pkg, crt = Package.objects.get_or_create(name=pkg_name)
-						PackageUpdate.objects.create(server=self,
-													 package=pkg,
-													 version=pkg_ver)
-				except Exception, e:
-					return str(e)
-			return "OK"
+		# Set server status if updates are available
 
 	@property
 	def owner(self):
