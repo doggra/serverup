@@ -130,6 +130,20 @@ def remove_server_group(request):
 	return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
+@login_required
+def server_check_updates(request, uuid):
+	s = get_object_or_404(Server, uuid=uuid)
+	s.check_updates()
+	return HttpResponse("OK")
+
+
+@login_required
+def server_update_all(request, uuid):
+	s = get_object_or_404(Server, uuid=uuid)
+	s.update()
+	return HttpResponse("OK")
+
+
 @csrf_exempt
 def install_server(request):
 
@@ -181,7 +195,7 @@ def install_server(request):
 		try:
 
 			# Generate ssh key pair.
-			os.system(('ssh-keygen -t rsa -b 4096'
+			os.system(('ssh-keygen -t rsa -b 4096 '
 					   '-C serverup -f {} -N ""').format(private_key_path,))
 			private_key = os.popen('cat {}'.format(private_key_path)).read()
 			__VAR_SSH_KEY = os.popen('cat {}'.format(private_key_path+".pub"))\

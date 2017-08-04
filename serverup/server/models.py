@@ -104,6 +104,9 @@ class Server(models.Model):
 
 		finally:
 			ssh.close()
+	def update(self):
+		non_ignored_packages = PackageUpdate.objects.filter(server=self,
+															ignore=False)
 
 	def check_updates(self):
 		if self.os == 0:

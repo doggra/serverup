@@ -74,6 +74,8 @@
 						{% endif %}
 					</tbody>
 				</table>
+				<a href="{% url 'server_update_all' object.pk %}" class="btn btn-success btn-block">Update server</a>
+				<a href="{% url 'server_check_updates' object.pk %}" class="btn btn-warning btn-block">Check for updates</a>
 				<a href="{% url 'server_edit' object.pk %}" class="btn btn-primary btn-block">Edit server</a>
 				<a href="{% url 'server_delete' object.pk %}" class="btn btn-danger btn-block">Delete server</a>
 			</div>
