@@ -7,6 +7,7 @@ import uuid
 import paramiko
 import select
 import StringIO
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -111,7 +112,6 @@ class Server(models.Model):
 			cmd = "yum check-update -q"
 
 		r = self.send_command(cmd)
-		print(r)
 
 		pkg_pack = []
 		# Parse output and save results.
