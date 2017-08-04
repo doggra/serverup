@@ -45,6 +45,7 @@ then
 fi
 
 case $SSH_ORIGINAL_COMMAND in
+    "id" | \
     "apt-get update -qq && apt-get upgrade -s" | "sudo apt-get update -qq && apt-get upgrade -s" | \
     "apt-get autoclean -y" | "sudo apt-get autoclean -y" | \
     "dpkg --configure -a" | "yum check-update -q" | \
