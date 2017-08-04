@@ -68,14 +68,6 @@ case $SSH_ORIGINAL_COMMAND in
         fi
         bash -c "$SSH_ORIGINAL_COMMAND"
         ;;
-    "sudo apt-get install --only-upgrade "*)
-        SUBSTRING=$(echo $SSH_ORIGINAL_COMMAND | cut -c -37)
-        if [[ "$SUBSTRING" =~ [^a-zA-Z0-9\-\ ] ]]; then
-            echo "Command not allowed: $SSH_ORIGINAL_COMMAND"
-            exit 2
-        fi
-        bash -c "$SSH_ORIGINAL_COMMAND"
-        ;;
     *)
         echo "Command not allowed: $SSH_ORIGINAL_COMMAND"
         exit 2

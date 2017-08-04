@@ -134,14 +134,14 @@ def remove_server_group(request):
 def server_check_updates(request, uuid):
 	s = get_object_or_404(Server, uuid=uuid)
 	s.check_updates()
-	return HttpResponse("OK")
+	return HttpResponseRedirect(reverse_lazy('server_details', args=[uuid,]))
 
 
 @login_required
 def server_update_all(request, uuid):
 	s = get_object_or_404(Server, uuid=uuid)
 	s.update()
-	return HttpResponse("OK")
+	return HttpResponseRedirect(reverse_lazy('server_details', args=[uuid,]))
 
 
 @csrf_exempt
