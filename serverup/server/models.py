@@ -114,7 +114,7 @@ class Server(models.Model):
 		if self.os == 0:
 			cmd = "apt-get install --only-upgrade {}".format(to_update,)
 		elif self.os == 1:
-			cmd = "yum update {}".format(to_update,)
+			cmd = "yum update -y {}".format(to_update,)
 
 		r = self.send_command(cmd)
 
