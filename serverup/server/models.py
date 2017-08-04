@@ -124,6 +124,7 @@ class Server(models.Model):
 											 version=pkg_ver)
 
 		# Set server status if updates are available
+		return r
 
 	@property
 	def owner(self):
