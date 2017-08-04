@@ -111,10 +111,19 @@ class Server(models.Model):
 		to_update = " ".join(list(query.values_list('package__name',
 													flat=True)))
 
-		cmd = "apt-get install --only-upgrade {}".format(to_update,)
+		if self.os == 0:
+			cmd = "apt-get install --only-upgrade {}".format(to_update,)
+		elif self.os == 1:
+			cmd = "yum update {}".format(to_update,)
+
 		r = self.send_command(cmd)
+
 		print(r)
+
+		# TODO: Condition - if everything was OK.
 		query.delete()
+		self.status = 0
+		self.save()
 
 	def check_updates(self):
 		if self.os == 0:
