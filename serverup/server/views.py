@@ -37,7 +37,7 @@ class Servers(TemplateView):
 		else:
 			context['servers'] = Server.objects.filter(user=self.request.user).exclude(status=3)
 		context['server_limit'] = self.request.user.profile.server_limit
-		context['updates'] = PackageUpdate.objects.filter(status=1)
+		context['updates'] = PackageUpdate.objects.all()
 		context['server_groups'] = ServerGroup.objects.filter(user=self.request.user)
 		context['install_script'] = "wget -O - http://{}/install/?u={} | bash".format( \
 							self.request.get_host(), self.request.user.profile.uuid)
@@ -53,7 +53,7 @@ class ServerDetails(DetailView):
 
 	def get_context_data(self, **kwargs):
 		context = super(ServerDetails, self).get_context_data(**kwargs)
-		context['updates'] = PackageUpdate.objects.filter(server=self.object,status__in=[0, 2])
+		context['updates'] = PackageUpdate.objects.filter(server=self.object)
 		context['available_groups'] = ServerGroup.objects.filter(user=self.request.user) \
 														 .exclude(servers=self.object)
 		return context
@@ -159,16 +159,19 @@ def install_server(request):
 		except TypeError:
 			pass
 
+		# Check SSH connection.
+		response = s.send_command('id')
+		if 'uid=0' not in response:
+			return HttpResponse(response)
+
 		# Installed.
 		s.status = 0
 		s.save()
 
-		# Check SSH connection.
-		response = s.check_updates()
-		if "FAIL" not in response:
-			return HttpResponse("OK")
-		else:
-			return HttpResponse(response)
+		# # Check for updates
+		# s.check_updates()
+
+		return HttpResponse("OK")
 
 	elif request.method == "GET":
 		user = request.GET['u']
