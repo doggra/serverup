@@ -133,8 +133,8 @@ class Server(models.Model):
 			elif self.os == 1:
 				m = re.search(r'([\w\._-]+)\s+([\w\._-]+)', line)
 				if m:
-					package = m.group(0)
-					version = m.group(1)
+					package = m.group(1)
+					version = m.group(2)
 
 			# Save package update in DB.
 			if package and version:
