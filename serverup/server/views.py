@@ -105,7 +105,8 @@ class ServerDeleteView(DeleteView):
 @login_required
 def add_group(request):
 	if request.method == 'POST':
-		ServerGroup.objects.get_or_create(user=request.user, name=request.POST['name'])
+		ServerGroup.objects.get_or_create(user=request.user,
+										  name=request.POST['name'])
 	return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
@@ -178,13 +179,17 @@ def install_server(request):
 		private_key_path = join(settings.PROJECT_ROOT, 'keys', user)
 
 		try:
-			# Generate ssh key and assign it to var
-			os.system('ssh-keygen -t rsa -b 4096 -C serverup -f {} -N ""'.format(private_key_path,))
+
+			# Generate ssh key pair.
+			os.system(('ssh-keygen -t rsa -b 4096'
+					   '-C serverup -f {} -N ""').format(private_key_path,))
 			private_key = os.popen('cat {}'.format(private_key_path)).read()
-			__VAR_SSH_KEY = os.popen('cat {}'.format(private_key_path+".pub")).read()
+			__VAR_SSH_KEY = os.popen('cat {}'.format(private_key_path+".pub"))\
+																		.read()
+
+			# Get user.
 			__VAR_USER = str(request.GET.get('u', ''))
 			user = User.objects.filter(profile__uuid=__VAR_USER)
-
 			if user:
 				server = Server.objects.create(user=user[0],
 											   public_key=__VAR_SSH_KEY,
