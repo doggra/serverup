@@ -148,7 +148,7 @@ class Server(models.Model):
 
 			# Get package updates for CentOS.
 			elif self.os == 1:
-				m = re.search(r'([\w\._-:+]+)\s+([\w\._-:+]+)', line)
+				m = re.search(r'([\w\._-\:+]+)\s+([\w\._-\:+]+)', line)
 				if m:
 					package = m.group(1)
 					version = m.group(2)
