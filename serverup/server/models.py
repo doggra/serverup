@@ -159,12 +159,11 @@ class Server(models.Model):
 		if self.status == 0:
 			return "<span class='badge bg-green'>UPDATED</span>"
 		elif self.status == 1:
-			count_pending_updates = UpdatePackage.objects.filter(server=self,
-																 status=1)\
-														 .count()
+			pending_updates = PackageUpdate.objects.filter(server=self,
+														   ignore=False).count()
 
 			return "<span class='badge bg-orange'>{} UPDATES</span>"\
-												.format(count_pending_updates,)
+												.format(pending_updates,)
 		elif self.status == 3:
 			return "<span class='badge bg-aqua'>INSTALL</span>"
 		elif self.status == 4:
