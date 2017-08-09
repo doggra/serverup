@@ -148,6 +148,22 @@ def server_update_all(request, uuid):
 
 
 @login_required
+def server_change_auto_updates(request, uuid):
+	s = get_object_or_404(Server, uuid=uuid)
+	s.toggle_auto_updates()
+	return HttpResponse(s.auto_updates)
+
+
+@login_required
+def server_change_update_interval(request, uuid):
+	interval = request.POST.get('interval', 24)
+	s = get_object_or_404(Server, uuid=uuid)
+	s.update_interval = interval
+	s.save()
+	return HttpResponseRedirect(reverse_lazy('server_details', args=[uuid,]))
+
+
+@login_required
 def package_change_ignore(request, package_id):
 	package = get_object_or_404(PackageUpdate, pk=package_id)
 	package.change_ignore()

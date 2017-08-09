@@ -82,6 +82,9 @@ class Server(models.Model):
 	public_key = models.TextField(blank=True)
 	private_key = models.TextField(blank=True)
 	last_check = models.DateTimeField(null=True, blank=True)
+	auto_updates = models.BooleanField(default=True)
+	update_interval = models.PositiveIntegerField(default=24) # in hours
+
 
 	def send_command(self, command):
 
@@ -99,14 +102,10 @@ class Server(models.Model):
 			return response
 
 		except paramiko.AuthenticationException, e:
-			self.status = 4
-			self.save()
 			print "Authentication failed when connecting to %s" % self.hostname
 			return "FAIL: {}".format(e)
 
 		except Exception, e:
-			self.status = 4
-			self.save()
 			print "Could not SSH to %s" % self.hostname
 			return "FAIL: {}".format(e)
 
@@ -184,6 +183,10 @@ class Server(models.Model):
 
 		self.save()
 		return r
+
+	def toggle_auto_updates(self):
+		self.auto_updates = True if self.auto_updates == False else False
+		self.save()
 
 	@property
 	def owner(self):

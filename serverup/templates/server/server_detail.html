@@ -15,6 +15,20 @@ function change_ignore(id) {
 	});
 }
 
+function change_auto_updates() {
+
+	var interval_link = document.getElementById("interval_link");
+	$.ajax({
+	  url: "/server/change/auto/{{ object.uuid }}/"
+	}).done(function(data) {
+		if (data == "False") {
+			interval_link.style.display = "none";
+		} else {
+			interval_link.style.display = "block";
+		}
+		console.log(interval_link);
+	});
+}
 </script>
 
 {% endblock extendhead %}
@@ -31,6 +45,30 @@ function change_ignore(id) {
 {% endblock contentheader %}
 
 {% block content %}
+
+<!-- Modal -->
+<div class="modal fade" id="update_interval" tabindex="-1" role="dialog" aria-labelledby="update_interval">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="update_interval">Set update interval</h4>
+      </div>
+      <form action="{% url 'server_change_update_interval' object.uuid %}" method="POST">
+      {% csrf_token %}
+      <div class="modal-body">
+  		<label for="interval_input">Interval (in hours)</label>
+    	<input name="interval" value="{{ object.update_interval }}" intervalid="interval_input" type="number" min="1" max="24" class="form-control">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 {% if request.GET.alert %}
 <div class="alert alert-success alert-dismissible">
   <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -46,18 +84,23 @@ function change_ignore(id) {
 		<a href="{% url 'server_update_all' object.pk %}" class="btn btn-primary">Update server</a>
 		{% endif %}
 		{% if object.status != 1 %}
-		<a href="{% url 'server_check_updates' object.pk %}" class="btn btn-primary">Check for updates</a>
+		<a href="{% url 'server_check_updates' object.pk %}" class="btn btn-primary">Manually check for updates</a>
 		{% endif %}
 		<a href="{% url 'server_edit' object.pk %}" class="btn btn-primary">Edit server</a>
 		<a href="{% url 'server_delete' object.pk %}" class="btn btn-danger">Delete server</a>
-		<div class="automanualup pull-right">
-			<div class="onoffswitch">
-			    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
-			    <label class="onoffswitch-label" for="myonoffswitch">
-			        <span class="onoffswitch-inner"></span>
-			        <span class="onoffswitch-switch"></span>
-			    </label>
+		<div class="pull-right">
+			<div class="automanualup">
+				<div class="onoffswitch">
+				    <input onclick="change_auto_updates();" type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" {% if object.auto_updates %}checked{% endif %}>
+				    <label class="onoffswitch-label" for="myonoffswitch">
+				        <span class="onoffswitch-inner"></span>
+				        <span class="onoffswitch-switch"></span>
+				    </label>
+				</div>
 			</div>
+		<div id="interval_link" class="text-right" style="padding-right:5px;">
+			<a data-toggle="modal" data-target="#update_interval" href="#"><i class="fa fa-clock-o" aria-hidden="true"></i> Set interval</a>
+		</div>
 		</div>
 	</div>
 </div>
@@ -246,3 +289,15 @@ function change_ignore(id) {
 </div>
 
 {% endblock content %}
+
+{% block extendfoot %}
+<script>
+var is_auto = {{ object.auto_updates|yesno:"true,false" }};
+if (is_auto) {
+	interval_link.style.display = "block";
+} else {
+	interval_link.style.display = "none";
+}
+</script>
+
+{% endblock extendfoot %}
