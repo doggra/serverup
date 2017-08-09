@@ -20,3 +20,11 @@ class Command(BaseCommand):
         profile = Profile(user=user, account_type=0)
         profile.save()
         print("User {0} crated".format(user.username))
+
+
+        user = User(username="Customer2")
+        user.set_password('custom22017')
+        user.save()
+        profile = Profile(user=user, account_type=0)
+        profile.save()
+        print("User {0} crated".format(user.username))
