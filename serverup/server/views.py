@@ -143,6 +143,8 @@ def server_check_updates(request, uuid):
 @login_required
 def server_update_all(request, uuid):
 	s = get_object_or_404(Server, uuid=uuid)
+	s.status = 2
+	s.save()
 	task_update_server.apply_async((uuid,))
 	return HttpResponseRedirect(reverse_lazy('server_details', args=[uuid,]))
 
