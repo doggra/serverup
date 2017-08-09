@@ -2,3 +2,4 @@
 env/
 script.sh
 *.key
+credentials.txt

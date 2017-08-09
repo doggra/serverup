@@ -49,7 +49,8 @@ DEFAULT_APPS = [
     'django.contrib.staticfiles',
     'bootstrap',
     'userland',
-    'server'
+    'server',
+    'serverup',
 ]
 
 
@@ -103,6 +104,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+### CELERY
+
+CELERY_IMPORTS = ('server',)
 
 ### SECRET KEY ##################################
 

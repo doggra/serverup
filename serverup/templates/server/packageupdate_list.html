@@ -4,6 +4,19 @@
 
 {% block menu_updates %}active{% endblock %}
 
+{% block extendhead %}
+<script type="text/javascript">
+
+function change_ignore(id) {
+	$.ajax({
+	  url: "/server/package/ignore/" + id,
+	  context: document.body
+	});
+}
+
+</script>
+{% endblock %}
+
 {% block contentheader %}
 	<h1>
 	  Updates
@@ -18,17 +31,18 @@
   <div class="col-md-12">
 	<div class="box">
 		<div class="box-header">
-		  <h3 class="box-title">Available updates</h3>
+		  <h3 class="box-title">Available updates for all servers</h3>
 		</div>
 		<div class="box-body no-padding">
-			<table id="servers" class="table table-hover">
+			<table class="packages_updates table table-hover">
 				<thead>
 				  <tr>
 					<th>Reported</th>
 					<th>Server</th>
 					<th>Package</th>
 					<th>Version</th>
-					<th>Action</th>
+					<th class="text-center">Action</th>
+					<th class="text-center">Manual update</th>
 				  </tr>
 				</thead>
 				<tbody>
@@ -39,13 +53,16 @@
 						<td>{{ update.package }}</td>
 						<td>{{ update.version }}</td>
 						<td>
-						<div class="onoffswitch">
-							<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="switch_{{ update.pk }}" {{ update.check_ignore }}>
-							<label class="onoffswitch-label" for="switch_{{ update.pk }}">
-								<span class="onoffswitch-inner"></span>
-								<span class="onoffswitch-switch"></span>
-							</label>
-						</div>
+							<div class="onoffswitch">
+								<input onclick="change_ignore({{ update.id }});" type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="switch_{{ update.pk }}" {{ update.check_ignore }}>
+								<label class="onoffswitch-label" for="switch_{{ update.pk }}">
+									<span class="onoffswitch-inner"></span>
+									<span class="onoffswitch-switch"></span>
+								</label>
+							</div>
+						</td>
+						<td class="text-center">
+							<a href="{% url 'package_manual_update' update.id %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-arrow-circle-o-up"></i></a>
 						</td>
 					</tr>
 				{% empty %}

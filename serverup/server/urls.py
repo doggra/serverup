@@ -1,11 +1,12 @@
 from django.conf.urls import url
 
 from .views import add_group, assign_server_group, remove_server_group, \
-				   server_check_updates, server_update_all
+				   server_check_updates, server_update_all, \
+				   package_change_ignore, package_manual_update
 
 from .views import Servers, ServerDetails, ServerGroupView, \
-				   PackageUpdateListView, ServerGroupDeleteView, ServerEditView, \
-				   ServerDeleteView
+				   PackageUpdateListView, ServerGroupDeleteView, \
+				   ServerEditView, ServerDeleteView
 
 urlpatterns = [
 	url(r'^$', Servers.as_view(), name='servers'),
@@ -22,5 +23,7 @@ urlpatterns = [
 	url(r'^group/delete/(?P<pk>\d+)/$', ServerGroupDeleteView.as_view(), name='delete_group'),
 
 	url(r'^check/(?P<uuid>[\w-]+)/$', server_check_updates, name='server_check_updates'),
-	url(r'^update/(?P<uuid>[\w-]+)/$', server_update_all, name='server_update_all')
+	url(r'^update/(?P<uuid>[\w-]+)/$', server_update_all, name='server_update_all'),
+	url(r'^package/ignore/(?P<package_id>\d+)/$', package_change_ignore, name='package_change_ignore'),
+	url(r'^package/update/(?P<package_id>\d+)/$', package_manual_update, name='package_manual_update'),
 ]

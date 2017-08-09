@@ -25,6 +25,18 @@ table.table.table-hover tr.link td {
 	padding:20px;
 }
 
+.server-details-buttons {
+    margin-bottom: 20px;
+}
+
+.table-btn {
+    margin-top: -3px;
+}
+
+table.packages_updates .onoffswitch {
+    margin: 0 auto;
+}
+
 .onoffswitch {
     position: relative; width: 90px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
@@ -62,11 +74,59 @@ table.table.table-hover tr.link td {
     position: absolute; top: 0; bottom: 0;
     right: 70px;
     border: 2px solid #999999; border-radius: 25px;
-    transition: all 0.3s ease-in 0s; 
+    transition: all 0.3s ease-in 0s;
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
     margin-left: 0;
 }
 .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
-    right: 0px; 
+    right: 0px;
+}
+
+
+
+.automanualup .onoffswitch {
+    position: relative; width: 200px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.automanualup .onoffswitch-checkbox {
+    display: none;
+}
+.automanualup .onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 20px;
+}
+.automanualup .onoffswitch-inner {
+    display: block; width: 200%; margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+.automanualup .onoffswitch-inner:before, .automanualup .onoffswitch-inner:after {
+    display: block; float: left; width: 50%; height: 30px; padding: 0; line-height: 30px;
+    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    box-sizing: border-box;
+}
+.automanualup .onoffswitch-inner:before {
+    content: "AUTOMATIC UPDATES";
+    padding-left: 16px;
+    background-color: #3c8dbc; color: #FFFFFF;
+}
+.automanualup .onoffswitch-inner:after {
+    content: "MANUAL UPDATES";
+    padding-right: 16px;
+    background-color: #EEEEEE; color: #999999;
+    text-align: right;
+}
+.automanualup .onoffswitch-switch {
+    display: block; width: 18px; margin: 6px;
+    background: #FFFFFF;
+    position: absolute; top: 0; bottom: 0;
+    right: 166px;
+    border: 2px solid #999999; border-radius: 20px;
+    transition: all 0.3s ease-in 0s;
+}
+.automanualup .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.automanualup .onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px;
 }

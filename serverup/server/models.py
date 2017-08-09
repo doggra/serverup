@@ -22,7 +22,7 @@ OS_DISTRO = (
 STATUS = (
 	(0, "UP TO DATE"),
 	(1, "UPDATES AVAILABLE"),
-	(2, "IGNORED"),
+	(2, "PENDING"),
 	(3, "INSTALL"),
 	(4, "ERROR")
 )
@@ -50,6 +50,10 @@ class PackageUpdate(models.Model):
 
 	def __unicode__(self):
 		return "{} [{}]".format(self.package.name, self.version)
+
+	def change_ignore(self):
+		self.ignore = True if self.ignore == False else False
+		self.save()
 
 	@property
 	def check_ignore(self):
@@ -95,21 +99,30 @@ class Server(models.Model):
 			return response
 
 		except paramiko.AuthenticationException, e:
+			self.status = 4
+			self.save()
 			print "Authentication failed when connecting to %s" % self.hostname
 			return "FAIL: {}".format(e)
 
 		except Exception, e:
+			self.status = 4
+			self.save()
 			print "Could not SSH to %s" % self.hostname
 			return "FAIL: {}".format(e)
 
 		finally:
 			ssh.close()
 
-	def update(self):
-		""" Function for updating all non-ignored packages """
-		query = PackageUpdate.objects.filter(server=self,ignore=False)
-		to_update = " ".join(list(query.values_list('package__name',
-													flat=True)))
+	def update(self, package=None):
+		""" Function for updating packages
+		"""
+		if package:
+			query = package
+			to_update = package.package.name
+		else:
+			query = PackageUpdate.objects.filter(server=self,ignore=False)
+			to_update = " ".join(list(query.values_list('package__name',
+														flat=True)))
 
 		if self.os == 0:
 			cmd = "apt-get install --only-upgrade {}".format(to_update,)
@@ -166,8 +179,10 @@ class Server(models.Model):
 		if len(pkg_pack) > 0:
 			self.last_check = datetime.datetime.now()
 			self.status = 1
-			self.save()
+		elif len(pkg_pack) == 0:
+			self.status = 0
 
+		self.save()
 		return r
 
 	@property
@@ -184,6 +199,8 @@ class Server(models.Model):
 
 			return "<span class='badge bg-orange'>{} UPDATES</span>"\
 												.format(pending_updates,)
+		elif self.status == 2:
+			return "<span class='badge bg-orange'>PENDING</span>"
 		elif self.status == 3:
 			return "<span class='badge bg-aqua'>INSTALL</span>"
 		elif self.status == 4:

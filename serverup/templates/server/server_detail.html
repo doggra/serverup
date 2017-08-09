@@ -6,6 +6,17 @@
 
 {% block extendhead %}
 <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
+
+<script type="text/javascript">
+
+function change_ignore(id) {
+	$.ajax({
+	  url: "/server/package/ignore/" + id
+	});
+}
+
+</script>
+
 {% endblock extendhead %}
 
 {% block contentheader %}
@@ -30,12 +41,33 @@
 </div>
 {% endif %}
 <div class="row">
+	<div class="server-details-buttons col-xs-12">
+		{% if object.status == 1 %}
+		<a href="{% url 'server_update_all' object.pk %}" class="btn btn-primary">Update server</a>
+		{% endif %}
+		{% if object.status != 1 %}
+		<a href="{% url 'server_check_updates' object.pk %}" class="btn btn-primary">Check for updates</a>
+		{% endif %}
+		<a href="{% url 'server_edit' object.pk %}" class="btn btn-primary">Edit server</a>
+		<a href="{% url 'server_delete' object.pk %}" class="btn btn-danger">Delete server</a>
+		<div class="automanualup pull-right">
+			<div class="onoffswitch">
+			    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
+			    <label class="onoffswitch-label" for="myonoffswitch">
+			        <span class="onoffswitch-inner"></span>
+			        <span class="onoffswitch-switch"></span>
+			    </label>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
 	<div class="col-md-5">
 		<div class="box">
 			<div class="box-header with-border">
 				<h3 class="box-title">Server information</h3>
 			</div>
-			<div class="box-body no-padding">
+			<div class="box-body">
 				<table class="table table-bordered">
 					<tbody>
 						<tr>
@@ -74,10 +106,6 @@
 						{% endif %}
 					</tbody>
 				</table>
-				<a href="{% url 'server_update_all' object.pk %}" class="btn btn-success btn-block">Update server</a>
-				<a href="{% url 'server_check_updates' object.pk %}" class="btn btn-warning btn-block">Check for updates</a>
-				<a href="{% url 'server_edit' object.pk %}" class="btn btn-primary btn-block">Edit server</a>
-				<a href="{% url 'server_delete' object.pk %}" class="btn btn-danger btn-block">Delete server</a>
 			</div>
 		</div>
 	</div>
@@ -168,12 +196,13 @@
 				<h3 class="box-title">Updates</h3>
 			</div>
 			<div class="box-body no-padding">
-				<table class="table table-bordered table-hover">
+				<table class="packages_updates table table-bordered table-hover">
 					<thead>
 						<tr>
 							<th>Package name</th>
 							<th>Version</th>
-							<th>Action</th>
+							<th class="text-center">Action</th>
+							<th class="text-center">Manual update</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -182,13 +211,16 @@
 							<td>{{ update.package.name }}</td>
 							<td>{{ update.version }}</td>
 							<td>
-							<div class="onoffswitch">
-								<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="switch_{{ update.pk }}" {{ update.check_ignore }}>
-								<label class="onoffswitch-label" for="switch_{{ update.pk }}">
-									<span class="onoffswitch-inner"></span>
-									<span class="onoffswitch-switch"></span>
-								</label>
-							</div>
+								<div class="onoffswitch">
+									<input onclick="change_ignore({{ update.id }});" type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="switch_{{ update.pk }}" {{ update.check_ignore }}>
+									<label class="onoffswitch-label" for="switch_{{ update.pk }}">
+										<span class="onoffswitch-inner"></span>
+										<span class="onoffswitch-switch"></span>
+									</label>
+								</div>
+							</td>
+							<td class="text-center">
+								<a href="{% url 'package_manual_update' update.id %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-arrow-circle-o-up"></i></a>
 							</td>
 						</tr>
 						{% endfor %}
@@ -204,7 +236,7 @@
 	<div class="col-xs-12">
 		<div class="box">
 			<div class="box-header with-border">
-				<h3 class="box-title">History</h3>
+				<h3 class="box-title">Task history</h3>
 			</div>
 			<div class="box-body text-center">
 			No history yet.
@@ -212,4 +244,5 @@
 		</div>
 	</div>
 </div>
+
 {% endblock content %}

@@ -20,6 +20,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from .models import Server, ServerGroup, PackageUpdate
+from .tasks import task_check_updates
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 
@@ -133,7 +134,9 @@ def remove_server_group(request):
 @login_required
 def server_check_updates(request, uuid):
 	s = get_object_or_404(Server, uuid=uuid)
-	s.check_updates()
+	s.status = 2
+	s.save()
+	task_check_updates.apply_async((uuid,))
 	return HttpResponseRedirect(reverse_lazy('server_details', args=[uuid,]))
 
 
@@ -142,6 +145,20 @@ def server_update_all(request, uuid):
 	s = get_object_or_404(Server, uuid=uuid)
 	s.update()
 	return HttpResponseRedirect(reverse_lazy('server_details', args=[uuid,]))
+
+
+@login_required
+def package_change_ignore(request, package_id):
+	package = get_object_or_404(PackageUpdate, pk=package_id)
+	package.change_ignore()
+	return HttpResponse("OK")
+
+
+@login_required
+def package_manual_update(request, package_id):
+	package = get_object_or_404(PackageUpdate, pk=package_id)
+	package.server.update(package=package)
+	return HttpResponseRedirect(reverse_lazy('server_details', args=[package.server.uuid,]))
 
 
 @csrf_exempt
