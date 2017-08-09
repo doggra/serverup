@@ -11,6 +11,6 @@ def task_check_updates(server_uuid):
 
 
 @app.task()
-def task_update_server(server_uuid):
+def task_update_server(server_uuid, package=None):
 	s = Server.objects.get(uuid=server_uuid)
-	s.update()
+	s.update(package=package)

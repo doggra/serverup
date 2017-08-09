@@ -83,9 +83,7 @@ function change_auto_updates() {
 		{% if object.status == 1 %}
 		<a href="{% url 'server_update_all' object.pk %}" class="btn btn-primary">Update server</a>
 		{% endif %}
-		{% if object.status != 1 %}
-		<a href="{% url 'server_check_updates' object.pk %}" class="btn btn-primary">Manually check for updates</a>
-		{% endif %}
+		<a href="{% url 'server_check_updates' object.pk %}" class="btn btn-primary">Check for updates</a>
 		<a href="{% url 'server_edit' object.pk %}" class="btn btn-primary">Edit server</a>
 		<a href="{% url 'server_delete' object.pk %}" class="btn btn-danger">Delete server</a>
 		<div class="pull-right">
@@ -145,6 +143,12 @@ function change_auto_updates() {
 						<tr>
 							<td>Owner</td>
 							<td>{{ object.user.username }}</td>
+						</tr>
+						{% endif %}
+						{% if object.auto_updates %}
+						<tr>
+							<td>Update interval</td>
+							<td>{{ object.update_interval }} hours</td>
 						</tr>
 						{% endif %}
 					</tbody>

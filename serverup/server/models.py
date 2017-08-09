@@ -133,8 +133,10 @@ class Server(models.Model):
 		print(r)
 
 		# TODO: Condition - if everything was OK.
+
 		query.delete()
-		self.status = 0
+		if PackageUpdate.objects.filter(server=self,ignore=False).count() == 0:
+			self.status = 0
 		self.save()
 
 	def check_updates(self):
@@ -194,14 +196,17 @@ class Server(models.Model):
 
 	@property
 	def show_status(self):
+		""" Display HTML status.
+		"""
 		if self.status == 0:
 			return "<span class='badge bg-green'>UPDATED</span>"
 		elif self.status == 1:
 			pending_updates = PackageUpdate.objects.filter(server=self,
-														   ignore=False).count()
+														   ignore=False)
+			c_pending = pending_updates.count()
 
 			return "<span class='badge bg-orange'>{} UPDATES</span>"\
-												.format(pending_updates,)
+												.format(c_pending,)
 		elif self.status == 2:
 			return "<span class='badge bg-orange'>PENDING</span>"
 		elif self.status == 3:
@@ -211,6 +216,8 @@ class Server(models.Model):
 
 	@property
 	def show_os_icon(self):
+		""" Display HTML icon of OS distribution.
+		"""
 		if self.os == 0:
 			return "<i class='devicon-debian-plain'></i>"
 		elif self.os == 1:
