@@ -20,7 +20,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from .models import Server, ServerGroup, PackageUpdate
-from .tasks import task_check_updates, task_update_server
+from .tasks import task_check_updates, task_update_server, task_update_package
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 
@@ -173,7 +173,7 @@ def package_change_ignore(request, package_id):
 @login_required
 def package_manual_update(request, package_id):
 	package = get_object_or_404(PackageUpdate, pk=package_id)
-	task_update_server.apply_async((package.server.uuid, package_id))
+	task_update_package.apply_async((package.server.uuid, package_id))
 	return HttpResponseRedirect(reverse_lazy('server_details', args=[package.server.uuid,]))
 
 
