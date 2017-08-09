@@ -173,7 +173,7 @@ def package_change_ignore(request, package_id):
 @login_required
 def package_manual_update(request, package_id):
 	package = get_object_or_404(PackageUpdate, pk=package_id)
-	task_update_server.apply_async((package.server.uuid, package))
+	task_update_server.apply_async((package.server.uuid, package_id))
 	return HttpResponseRedirect(reverse_lazy('server_details', args=[package.server.uuid,]))
 
 
