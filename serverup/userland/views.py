@@ -37,7 +37,7 @@ class Dashboard(TemplateView):
 		servers = servers.exclude(status=3)
 
 		context['servers_count'] = servers.count()
-		context['available_updates'] = PackageUpdate.objects.filter(server__in=servers).count()
+		context['available_updates'] = PackageUpdate.objects.filter(server__in=servers, ignore=False).count()
 		return context
 
 @method_decorator(login_required, name='dispatch')
