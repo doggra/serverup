@@ -267,7 +267,7 @@ function change_auto_updates() {
 								</div>
 							</td>
 							<td class="text-center">
-								<a href="{% url 'package_manual_update' update.id %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-arrow-circle-o-up"></i></a>
+								<a href="{% url 'package_manual_update' object.uuid update.package.name %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-arrow-circle-o-up"></i></a>
 							</td>
 						</tr>
 						{% endfor %}

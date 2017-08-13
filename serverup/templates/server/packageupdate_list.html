@@ -41,7 +41,7 @@ function change_ignore(id) {
 					<th>Server</th>
 					<th>Package</th>
 					<th>Version</th>
-					<th class="text-center">Action</th>
+					<th class="text-center">Auto-updates</th>
 					<th class="text-center">Manual update</th>
 				  </tr>
 				</thead>
@@ -62,7 +62,7 @@ function change_ignore(id) {
 							</div>
 						</td>
 						<td class="text-center">
-							<a href="{% url 'package_manual_update' update.id %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-arrow-circle-o-up"></i></a>
+							<a href="{% url 'package_manual_update' update.server.uuid update.package.name %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-arrow-circle-o-up"></i></a>
 						</td>
 					</tr>
 				{% empty %}

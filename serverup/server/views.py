@@ -173,10 +173,9 @@ def package_change_ignore(request, package_id):
 
 
 @login_required
-def package_manual_update(request, package_id):
-	package = get_object_or_404(PackageUpdate, pk=package_id)
-	task_update_package.apply_async((package.server.uuid, package_id))
-	return HttpResponseRedirect(reverse_lazy('server_details', args=[package.server.uuid,]))
+def package_manual_update(request, uuid, package_name):
+	task_update_package.apply_async((uuid, package_name))
+	return HttpResponseRedirect(reverse_lazy('server_details', args=[uuid,]))
 
 
 @csrf_exempt

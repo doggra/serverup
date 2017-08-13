@@ -30,5 +30,5 @@ urlpatterns = [
 														name='server_change_update_interval'),
 
 	url(r'^package/ignore/(?P<package_id>\d+)/$', package_change_ignore, name='package_change_ignore'),
-	url(r'^package/update/(?P<package_id>\d+)/$', package_manual_update, name='package_manual_update'),
+	url(r'^package/update/(?P<uuid>[\w-]+)/(?P<package_name>[:+\w\._-]+)/$', package_manual_update, name='package_manual_update'),
 ]
