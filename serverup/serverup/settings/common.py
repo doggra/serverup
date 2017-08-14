@@ -51,6 +51,7 @@ DEFAULT_APPS = [
     'userland',
     'server',
     'serverup',
+    'history'
 ]
 
 
