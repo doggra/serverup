@@ -34,11 +34,14 @@ class Dashboard(TemplateView):
 		elif self.request.user.profile.account_type == 2:
 			servers = Server.objects.all()
 
+		# Exclude servers with INSTALL status.
 		servers = servers.exclude(status=3)
 
 		context['servers_count'] = servers.count()
-		context['available_updates'] = PackageUpdate.objects.filter(server__in=servers, ignore=False).count()
+		context['updates_count'] = PackageUpdate.objects.filter(server__in=servers,
+																ignore=False).count()
 		return context
+
 
 @method_decorator(login_required, name='dispatch')
 class History(TemplateView):
