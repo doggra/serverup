@@ -23,6 +23,14 @@ from .models import Server, ServerGroup, PackageUpdate
 from .tasks import task_check_updates, task_update_server, task_update_package
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import PermissionDenied
+
+
+def test_server_owner(request, server):
+	if request.user.id != server.user.id:
+		raise PermissionDenied
+		return None
+	return server
 
 
 @method_decorator(login_required, name='dispatch')
@@ -50,7 +58,9 @@ class ServerDetails(DetailView):
 	model = Server
 
 	def get_object(self):
-		return get_object_or_404(Server, uuid=self.kwargs['uuid'])
+		server = get_object_or_404(Server, uuid=self.kwargs['uuid'])
+		return test_server_owner(self.request, server)
+
 
 	def get_context_data(self, **kwargs):
 		context = super(ServerDetails, self).get_context_data(**kwargs)
@@ -59,15 +69,17 @@ class ServerDetails(DetailView):
 														 .exclude(servers=self.object)
 		return context
 
+
 @method_decorator(login_required, name='dispatch')
 class ServerEditView(UpdateView):
 
 	model = Server
-	fields = ['ip', 'hostname']
+	fields = ['ip', 'hostname', 'ssh_port', 'public_key', 'private_key']
 	template_name = "server/server_edit.html"
 
 	def get_object(self):
-		return get_object_or_404(Server, uuid=self.kwargs['uuid'])
+		server = get_object_or_404(Server, uuid=self.kwargs['uuid'])
+		return test_server_owner(self.request, server)
 
 	def get_success_url(self):
 		return "{}?alert=1&updated=1".format(reverse('server_details', \
@@ -79,13 +91,18 @@ class ServerEditView(UpdateView):
 
 
 @method_decorator(login_required, name='dispatch')
-class ServerGroupView(DetailView):
-	model = ServerGroup
+class ServerDeleteView(DeleteView):
+	model = Server
+	success_url = reverse_lazy('servers')
+
+	def get_object(self):
+		server = get_object_or_404(Server, uuid=self.kwargs['uuid'])
+		return test_server_owner(self.request, server)
 
 
 @method_decorator(login_required, name='dispatch')
-class PackageUpdateListView(ListView):
-	model = PackageUpdate
+class ServerGroupView(DetailView):
+	model = ServerGroup
 
 
 @method_decorator(login_required, name='dispatch')
@@ -95,13 +112,15 @@ class ServerGroupDeleteView(DeleteView):
 
 
 @method_decorator(login_required, name='dispatch')
-class ServerDeleteView(DeleteView):
-	model = Server
-	success_url = reverse_lazy('servers')
+class PackageUpdateListView(ListView):
+	model = PackageUpdate
 
-	def get_object(self):
-		return get_object_or_404(Server, uuid=self.kwargs['uuid'])
+	def get_queryset(self):
+		queryset = PackageUpdate.objects.filter(user=self.request.user)
+		return queryset
 
+
+### Server groups functions
 
 @login_required
 def add_group(request):
@@ -116,6 +135,9 @@ def assign_server_group(request):
 	if request.method == 'POST':
 		group = get_object_or_404(ServerGroup, pk=request.POST['groupid'])
 		server = get_object_or_404(Server, pk=request.POST['serverid'])
+
+		test_server_owner(self.request, server)
+
 		group.servers.add(server)
 		group.save()
 	return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -126,6 +148,9 @@ def remove_server_group(request):
 	if request.method == 'POST':
 		group = get_object_or_404(ServerGroup, pk=request.POST['groupid'])
 		server = get_object_or_404(Server, pk=request.POST['serverid'])
+
+		test_server_owner(self.request, server)
+
 		group.servers.remove(server)
 		group.save()
 	return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -134,6 +159,9 @@ def remove_server_group(request):
 @login_required
 def server_check_updates(request, uuid):
 	s = get_object_or_404(Server, uuid=uuid)
+
+	test_server_owner(request, s)
+
 	s.status = 2
 	s.save()
 	task_check_updates.apply_async((uuid,))
@@ -143,6 +171,9 @@ def server_check_updates(request, uuid):
 @login_required
 def server_update_all(request, uuid):
 	s = get_object_or_404(Server, uuid=uuid)
+
+	test_server_owner(request, s)
+
 	s.status = 2
 	s.save()
 	task_update_server.apply_async((uuid,))
@@ -152,6 +183,9 @@ def server_update_all(request, uuid):
 @login_required
 def server_change_auto_updates(request, uuid):
 	s = get_object_or_404(Server, uuid=uuid)
+
+	test_server_owner(request, s)
+
 	s.toggle_auto_updates()
 	return HttpResponse(s.auto_updates)
 
@@ -160,6 +194,9 @@ def server_change_auto_updates(request, uuid):
 def server_change_update_interval(request, uuid):
 	interval = request.POST.get('interval', 24)
 	s = get_object_or_404(Server, uuid=uuid)
+
+	test_server_owner(request, s)
+
 	s.update_interval = interval
 	s.save()
 	return HttpResponseRedirect(reverse_lazy('server_details', args=[uuid,]))
@@ -168,12 +205,20 @@ def server_change_update_interval(request, uuid):
 @login_required
 def package_change_ignore(request, package_id):
 	package = get_object_or_404(PackageUpdate, pk=package_id)
-	package.change_ignore()
+
+	test_server_owner(request, package.server)
+
+	package.ignore = True if package.ignore == False else False
+	package.save()
 	return HttpResponse("OK")
 
 
 @login_required
 def package_manual_update(request, uuid, package_name):
+	server = get_object_or_404(Server, uuid=uuid)
+
+	test_server_owner(request, server)
+
 	task_update_package.apply_async((uuid, package_name))
 	return HttpResponseRedirect(reverse_lazy('server_details', args=[uuid,]))
 
@@ -235,7 +280,7 @@ def install_server(request):
 			__VAR_SSH_KEY = os.popen('cat {}'.format(private_key_path+".pub"))\
 																		.read()
 
-			# Get user.
+			# Get user by uuid.
 			__VAR_USER = str(request.GET.get('u', ''))
 			user = User.objects.filter(profile__uuid=__VAR_USER)
 			if user:

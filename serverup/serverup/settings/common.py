@@ -51,9 +51,13 @@ DEFAULT_APPS = [
     'userland',
     'server',
     'serverup',
-    'history'
+    'history',
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
+)
 
 ### MIDDLEWARES CONFIG  #########################
 

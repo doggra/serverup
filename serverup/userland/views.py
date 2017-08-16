@@ -20,6 +20,8 @@ from .models import Customer, Reseller
 from .forms import OwnProfileEditForm
 from server.models import Server, PackageUpdate
 
+from django.contrib.auth.decorators import user_passes_test
+
 
 @method_decorator(login_required, name='dispatch')
 class Dashboard(TemplateView):
@@ -38,7 +40,7 @@ class Dashboard(TemplateView):
 		servers = servers.exclude(status=3)
 
 		context['servers_count'] = servers.count()
-		context['updates_count'] = PackageUpdate.objects.filter(server__in=servers,
+		context['updates_count'] = PackageUpdate.objects.filter(user=self.request.user,
 																ignore=False).count()
 		return context
 
