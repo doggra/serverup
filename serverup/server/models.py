@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from history.models import Event
 
+
 OS_DISTRO = (
     (0, "Debian"),
     (1, "Centos"),
@@ -25,6 +26,7 @@ STATUS = (
     (3, "INSTALL"),
     (4, "ERROR")
 )
+
 
 class Package(models.Model):
     name = models.CharField(max_length=255)
@@ -48,15 +50,6 @@ class PackageUpdate(models.Model):
     def check_ignore(self):
         """ Return checked to HTML input (checkbox) """
         return "checked" if not self.ignore else ""
-
-    @property
-    def show_status(self):
-        if self.status == 0:
-            return "<span class='badge bg-orange'>PENDING</span>"
-        elif self.status == 1:
-            return "<span class='badge bg-green'>UPDATED</span>"
-        elif self.status == 2:
-            return "<span class='badge bg-red'>IGNORED</span>"
 
 
 class Server(models.Model):
@@ -123,9 +116,6 @@ class Server(models.Model):
 
         r = self.send_command(cmd)
 
-        print(r)
-        # TODO: Condition - if everything was OK.
-
         query.delete()
         if PackageUpdate.objects.filter(server=self, ignore=False).count() == 0:
             self.status = 0
@@ -138,7 +128,6 @@ class Server(models.Model):
             cmd = "yum check-update -q"
 
         r = self.send_command(cmd)
-        print(r)
 
         pkg_pack = []
          
@@ -192,10 +181,6 @@ class Server(models.Model):
         self.save()
 
     @property
-    def owner(self):
-        return self.user.username
-
-    @property
     def show_status(self):
         """ Display HTML status.
         """
@@ -227,6 +212,7 @@ class Server(models.Model):
             return "?"
 
     def delete(self):
+        # Send uninstall command to server on delete.
         r = self.send_command('/usr/local/bin/serverup-uninstall')
         print(r)
         super(Server, self).delete()
