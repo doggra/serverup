@@ -3,6 +3,7 @@ from serverup.celery import app
 
 from .models import Server, PackageUpdate
 
+
 @app.task()
 def task_check_updates(server_uuid):
 	s = Server.objects.get(uuid=server_uuid)

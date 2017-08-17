@@ -3,7 +3,8 @@ from django.conf.urls import url
 from .views import add_group, assign_server_group, remove_server_group, \
 				   server_check_updates, server_update_all, \
 				   package_change_ignore, package_manual_update, \
-				   server_change_auto_updates, server_change_update_interval
+				   server_change_auto_updates, server_change_update_interval, \
+				   check_server_status
 
 from .views import Servers, ServerDetails, ServerGroupView, \
 				   PackageUpdateListView, ServerGroupDeleteView, \
@@ -31,4 +32,5 @@ urlpatterns = [
 
 	url(r'^package/ignore/(?P<package_id>\d+)/$', package_change_ignore, name='package_change_ignore'),
 	url(r'^package/update/(?P<uuid>[\w-]+)/(?P<package_name>[:+\w\._-]+)/$', package_manual_update, name='package_manual_update'),
+	url(r'^status/(?P<uuid>[\w-]+)/$', check_server_status, name='check_server_status'),
 ]

@@ -11,7 +11,7 @@ import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-
+from history.models import Event
 
 OS_DISTRO = (
     (0, "Debian"),
@@ -88,6 +88,7 @@ class Server(models.Model):
             ssh.connect(hostname=self.ip, username='root', pkey=pkey)
             stdin, stdout, stderr = ssh.exec_command(command)
             response = stdout.read()
+            Event.objects.create(info=response, extra_info=command, server=self)
             return response
 
         except paramiko.AuthenticationException, e:
@@ -169,13 +170,13 @@ class Server(models.Model):
 
             else:
                 pass
-                # Report error (no version or package name ?)
+                # TODO Report error (no version or package name ?)
 
-        # Set pending status if new packages version available.
+        # Set server pending status if new updates available.
         if len(pkg_pack) > 0:
             self.status = 1
 
-        # Or up2date status if no new packages to update
+        # Set updated status if no new updates.
         elif len(pkg_pack) == 0:
             self.status = 0
 

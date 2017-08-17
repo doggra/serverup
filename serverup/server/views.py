@@ -120,7 +120,7 @@ class PackageUpdateListView(ListView):
 		return queryset
 
 
-### Server groups functions
+### Server groups API
 
 @login_required
 def add_group(request):
@@ -155,6 +155,8 @@ def remove_server_group(request):
 		group.save()
 	return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
+
+### Update API
 
 @login_required
 def server_check_updates(request, uuid):
@@ -221,6 +223,17 @@ def package_manual_update(request, uuid, package_name):
 
 	task_update_package.apply_async((uuid, package_name))
 	return HttpResponseRedirect(reverse_lazy('server_details', args=[uuid,]))
+
+
+### Server API
+
+@login_required
+def check_server_status(request, uuid):
+	server = get_object_or_404(Server, uuid=uuid)
+	test_server_owner(request, server)
+	if request.GET.get('dspl', '') == '1':
+		return HttpResponse(server.show_status)
+	return HttpResponse(server.status)
 
 
 @csrf_exempt

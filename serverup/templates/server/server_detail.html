@@ -121,7 +121,7 @@ function change_auto_updates() {
 						</tr>
 						<tr>
 							<td>Status</td>
-							<td>{{ object.show_status|safe }}</td>
+							<td id="status_cell">{{ object.show_status|safe }}</td>
 						</tr>
 						<tr>
 							<td>OS</td>
@@ -302,6 +302,20 @@ if (is_auto) {
 } else {
 	interval_link.style.display = "none";
 }
+
+$(document).ready( function() {
+	var status_cell = $("#status_cell")
+
+	function status_display() {
+		$.ajax({
+		  url: "/server/status/{{ object.uuid }}/?dspl=1"
+		}).done(function(data) {
+			status_cell.html(data);
+		});
+	}
+
+    setInterval(status_display, 6000);
+});
 </script>
 
 {% endblock extendfoot %}
