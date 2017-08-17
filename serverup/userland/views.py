@@ -22,6 +22,7 @@ from server.models import Server, PackageUpdate
 
 from django.contrib.auth.decorators import user_passes_test
 
+from django.core.exceptions import PermissionDenied
 
 @method_decorator(login_required, name='dispatch')
 class Dashboard(TemplateView):
@@ -29,16 +30,7 @@ class Dashboard(TemplateView):
 
 	def get_context_data(self, **kwargs):
 		context = super(Dashboard, self).get_context_data(**kwargs)
-		if self.request.user.profile.account_type == 0:
-			servers = Server.objects.filter(user=self.request.user).exclude(status=3)
-		elif self.request.user.profile.account_type == 1:
-			servers = Server.objects.filter(user__customer__reseller=self.request.user)
-		elif self.request.user.profile.account_type == 2:
-			servers = Server.objects.all()
-
-		# Exclude servers with INSTALL status.
-		servers = servers.exclude(status=3)
-
+		servers = Server.objects.filter(user=self.request.user).exclude(status=3)
 		context['servers_count'] = servers.count()
 		context['updates_count'] = PackageUpdate.objects.filter(user=self.request.user,
 																ignore=False).count()
@@ -108,6 +100,15 @@ class ChangePasswordView(auth_views.PasswordChangeView):
 @method_decorator(login_required, name='dispatch')
 class CustomerListView(ListView):
 	model = Customer
+
+	def get_queryset(self):
+		acc_type = self.request.user.profile.account_type
+		if acc_type == 0:
+			raise PermissionDenied
+		elif acc_type == 1:
+			return Customer.objects.filter(reseller__user=request.user)
+		elif acc_type == 2:
+			return Customer.objects.all()
 
 
 @method_decorator(login_required, name='dispatch')
