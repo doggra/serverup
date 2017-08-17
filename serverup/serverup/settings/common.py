@@ -54,11 +54,6 @@ DEFAULT_APPS = [
     'history',
 ]
 
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'guardian.backends.ObjectPermissionBackend',
-)
-
 ### MIDDLEWARES CONFIG  #########################
 
 MIDDLEWARE_CLASSES = [
