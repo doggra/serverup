@@ -24,7 +24,7 @@ from .tasks import task_check_updates, task_update_server, task_update_package
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
-
+from history.models import Event
 
 def test_server_owner(request, server):
 	if request.user.id != server.user.id:
@@ -40,11 +40,7 @@ class Servers(TemplateView):
 	def get_context_data(self, **kwargs):
 		context = super(Servers, self).get_context_data(**kwargs)
 
-		# Display all servers if user is superuser
-		if self.request.user.is_staff:
-			context['servers'] = Server.objects.exclude(status=3)
-		else:
-			context['servers'] = Server.objects.filter(user=self.request.user).exclude(status=3)
+		context['servers'] = Server.objects.filter(user=self.request.user).exclude(status=3)
 		context['server_limit'] = self.request.user.profile.server_limit
 		context['updates'] = PackageUpdate.objects.all()
 		context['server_groups'] = ServerGroup.objects.filter(user=self.request.user)
@@ -67,6 +63,8 @@ class ServerDetails(DetailView):
 		context['updates'] = PackageUpdate.objects.filter(server=self.object)
 		context['available_groups'] = ServerGroup.objects.filter(user=self.request.user) \
 														 .exclude(servers=self.object)
+		context['events'] = Event.objects.filter(server=self.object)
+
 		return context
 
 

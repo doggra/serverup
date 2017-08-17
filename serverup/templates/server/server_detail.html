@@ -285,9 +285,30 @@ function change_auto_updates() {
 			<div class="box-header with-border">
 				<h3 class="box-title">Task history</h3>
 			</div>
-			<div class="box-body text-center">
-			No history yet.
-			</div>
+			<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>Date & time</th>
+					<th>Event type</th>
+					<th>Result</th>
+					<th>Extra info</th>
+				</tr>
+			</thead>
+			<tbody>
+			{% for event in events %}
+				<tr>
+					<td>{{ event.datetime }}</td>
+					<td>{{ event.get_event_type_display }}</td>
+					<td>{{ event.info|linebreaks }}</td>
+					<td>{{ event.extra_info }}</td>
+				</tr>
+			{% empty %}
+				<tr>
+					<td class="text-center" colspan="4">No history yet</td>
+				</tr>
+			{% endfor %}
+			</tbody>
+			</table>
 		</div>
 	</div>
 </div>

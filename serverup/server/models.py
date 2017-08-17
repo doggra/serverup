@@ -88,7 +88,10 @@ class Server(models.Model):
             ssh.connect(hostname=self.ip, username='root', pkey=pkey)
             stdin, stdout, stderr = ssh.exec_command(command)
             response = stdout.read()
+
+            # Add history event
             Event.objects.create(info=response, extra_info=command, server=self)
+
             return response
 
         except paramiko.AuthenticationException, e:
@@ -159,7 +162,7 @@ class Server(models.Model):
                     version = m.group(2)
 
             # Save package update in DB.
-            if package and version:
+            if package and version and 'FAIL' not in package:
                 pkg, crt = Package.objects.get_or_create(name=package)
                 pkg_upt, crt = PackageUpdate.objects\
                                                 .get_or_create(user=self.user,
