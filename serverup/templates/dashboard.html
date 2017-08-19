@@ -19,7 +19,7 @@
     <div class="col-lg-3 col-xs-6">
       <div class="small-box bg-primary">
         <div class="inner">
-          <h3>{{ servers_count }}</h3>
+          <h3>{{ servers_count }} / {{ user.customer.server_limit|default:0 }}</h3>
           <p>Servers</p>
         </div>
         <div class="icon">
@@ -79,6 +79,23 @@
       </div>
     </div>
     <!-- UPDATES BOX END -->
+
+    {% if user.profile.account_type == 0 %}
+    <!-- CREDITS BOX -->
+      <div class="col-lg-3 col-xs-6">
+        <div class="small-box bg-green">
+          <div class="inner">
+            <h3>{{ user.customer.credits|default:0 }}</h3>
+            <p>Credits</p>
+          </div>
+          <div class="icon">
+            <i class="fa fa-eur"></i>
+          </div>
+          <a href="{% url 'accounting' %}" class="small-box-footer">Show&nbsp;&nbsp;<i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+    <!-- CREDITS BOX END -->
+    {% endif %}
 
   </div>
 {% endblock content %}

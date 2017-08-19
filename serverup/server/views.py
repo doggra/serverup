@@ -19,6 +19,7 @@ from django.views.generic.edit import DeleteView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
+from userland.models import Customer
 from .models import Server, ServerGroup, PackageUpdate
 from .tasks import task_check_updates, task_update_server, task_update_package
 from django.contrib.auth.models import User
@@ -41,11 +42,17 @@ class Servers(TemplateView):
 		context = super(Servers, self).get_context_data(**kwargs)
 
 		context['servers'] = Server.objects.filter(user=self.request.user).exclude(status=3)
-		context['server_limit'] = self.request.user.profile.server_limit
 		context['updates'] = PackageUpdate.objects.all()
 		context['server_groups'] = ServerGroup.objects.filter(user=self.request.user)
 		context['install_script'] = "wget -O - http://{}/install/?u={} | bash".format( \
 							self.request.get_host(), self.request.user.profile.uuid)
+
+		# Get servers limit - (only customer) if not exists - show 0
+		try:
+			context['server_limit'] = self.request.user.customer.server_limit
+		except Customer.DoesNotExist:
+			context['server_limit'] = 0
+
 		return context
 
 

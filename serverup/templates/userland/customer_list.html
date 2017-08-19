@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load staticfiles %}
+{% load staticfiles bootstrap_forms %}
 
 {% block menu_customer %}active{% endblock %}
 
@@ -10,13 +10,40 @@
       <small>List</small>
     </h1>
     <ol class="breadcrumb">
-      <li><a href="#"><i class="fa fa-user-circle-o"></i> Customers</a></li>
+      <li><a href="{% url 'customer_list' %}"><i class="fa fa-user-circle-o"></i> Customers</a></li>
       <li class="active">List</li>
     </ol>
 {% endblock contentheader %}
 
 {% block content %}
-<button class="btn btn-primary"><i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Create new customer</button>
+
+<!-- Modal -->
+<div class="modal fade" id="create_customer" tabindex="-1" role="dialog" aria-labelledby="create_customer">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="create_customer">Create new customer</h4>
+      </div>
+      <form action="{% url 'create_customer' %}" method="POST">
+      {% csrf_token %}
+      <div class="modal-body">
+        {{ user_form|as_bootstrap }}
+        <p>
+        <label for="password">Password</label>
+        <input type="text" id="password" class="form-control" name="password">
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<button class="btn btn-primary" data-toggle="modal" data-target="#create_customer"><i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Create new customer</button>
 
 <div id="customers" class="box">
   <div class="box-body">
@@ -25,17 +52,29 @@
           <tr>
             <th style="width:24px;"></th>
             <th>Username</th>
+            <th>Reseller</th>
+            <th>E-mail</th>
             <th class="text-center">Servers</th>
             <th class="text-center" title="Servers limit">Limit&nbsp;&nbsp;(<i class="fa fa-server"></i>)</th>
+            <th class="text-center">Edit</th>
           </tr>
         </thead>
         <tbody>
+            {% for customer in object_list %}
             <tr>
               <td><i class="fa fa-user"></i></td>
-              <td>Username</td>
-              <td class="text-center">1</td>
-              <td class="text-center">1</td>
+              <td>{{ customer.user.username }}</td>
+              <td>{{ customer.reseller }}</td>
+              <td>{{ customer.user.email }}</td>
+              <td class="text-center">{{ customer.user.server_set.count }}</td>
+              <td class="text-center">{{ customer.servers_limit }}</td>
+              <td class="text-center"><a href="{% url 'customer_edit' customer.user.profile.uuid %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
             </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5">No customers.</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
   </div>

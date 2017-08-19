@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% load bootstrap_forms %}
+
+{% block contentheader %}
+  <h1>
+    Customer edit
+    <small>{{ customer.user.username }}</small>
+  </h1>
+  
+  <ol class="breadcrumb">
+    <li><a href="{% url 'customer_list' %}"><i class="fa fa-user-circle-o"></i> Customers</a></li>
+    <li class="active">Edit</li>
+  </ol>
+{% endblock contentheader %}
+
+{% block content %}
+<div class="box">
+  <div class="box-body">
+    <form method="POST">
+      {% csrf_token %}
+
+      {{ form|as_bootstrap }}
+      <p>
+      <label for="new_password">New password</label>
+      <input type="text" id="new_password" class="form-control" name="new_password">
+      </p>
+      <div class="form-group">
+        <button type="submit" class="btn btn-success">Submit</button>
+        <a class="btn btn-danger" href="{% url 'customer_list' %}">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock content %}

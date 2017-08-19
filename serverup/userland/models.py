@@ -15,21 +15,21 @@ ACCOUNT_TYPES = (
 
 class Reseller(models.Model):
 	user = models.OneToOneField(User)
+	credits = models.IntegerField(default=0)
 	customers_limit = models.IntegerField(default=1)
+	administrator = models.ForeignKey(User, null=True, related_name='resellers')
 
 
 class Customer(models.Model):
 	user = models.OneToOneField(User)
 	credits = models.IntegerField(default=0)
 	servers_limit = models.IntegerField(default=1)
-	reseller = models.ForeignKey(Reseller, blank=True)
+	reseller = models.ForeignKey(User, null=True, related_name='customers')
 
 
 class Profile(models.Model):
 	uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
 	user = models.OneToOneField(User)
-	credits = models.IntegerField(default=0)
-	server_limit = models.IntegerField(default=0)
 	account_type = models.IntegerField(choices=ACCOUNT_TYPES, default=0)
 
 
@@ -41,14 +41,13 @@ class Profile(models.Model):
 		return self.get_account_type_display()
 
 	def can_add_server(self):
-		if self.server_limit > 0:
-			print(self.user.server_set.count(), self.server_limit)
-			mat = self.user.server_set.count() - self.server_limit
+		# If reseller or administrator - no restrictions to add new servers.
+		if self.account_type > 0:
+			return True
+		else:
+			mat = self.user.server_set.count() - self.user.customer.server_limit
 			if mat < 0:
 				# Return remaining number of available servers
 				return -mat
 			else:
 				return False
-		else:
-			# server_limit == 0 == unlimited servers.
-			return True
