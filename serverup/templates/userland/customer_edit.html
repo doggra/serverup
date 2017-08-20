@@ -21,10 +21,28 @@
       {% csrf_token %}
 
       {{ form|as_bootstrap }}
+
+      {% if user.profile.account_type == 2 %}
       <p>
-      <label for="new_password">New password</label>
-      <input type="text" id="new_password" class="form-control" name="new_password">
+        <label for="reseller">Reseller</label>
+        <select class="form-control" id="reseller" name="reseller">
+          {% for reseller in resellers %}
+            <option value="{{ reseller.user.pk }}">{{ reseller.user }}</option>
+          {% endfor %}
+        </select>
       </p>
+      {% endif %}
+
+      <p>
+        <label for="servers_limit">Servers limit</label>
+        <input class="form-control" name="servers_limit" type="number" min="1" value="1">
+      </p>
+
+      <p>
+        <label for="new_password">New password</label>
+        <input type="password" id="new_password" class="form-control" name="new_password">
+      </p>
+
       <div class="form-group">
         <button type="submit" class="btn btn-success">Submit</button>
         <a class="btn btn-danger" href="{% url 'customer_list' %}">Cancel</a>

@@ -3,7 +3,8 @@ from django.contrib import admin
 
 from userland.views import Dashboard, OwnProfile, OwnProfileEdit, History, LoginView, \
 				   LogoutView, ChangePasswordView, CustomerListView, ResellerListView, \
-				   Accounting, CustomerEditView, create_customer
+				   Accounting, CustomerEditView, ResellerEditView, create_customer, \
+				   create_reseller
 
 from django.contrib.auth import views as auth_views
 
@@ -29,11 +30,14 @@ urlpatterns = [
 	# App
 	url(r'^server/', include('server.urls')),
 	url(r'^accounting/$', Accounting.as_view(), name='accounting'),
+
 	url(r'^customer/list/$', CustomerListView.as_view(), name='customer_list'),
 	url(r'^customer/create/$', create_customer, name='create_customer'),
 	url(r'^customer/edit/(?P<uuid>[\w-]+)/$', CustomerEditView.as_view(), name='customer_edit'),
 
+	url(r'^reseller/create/$', create_reseller, name='create_reseller'),
 	url(r'^reseller/list/$', ResellerListView.as_view(), name='reseller_list'),
+	url(r'^reseller/edit/(?P<uuid>[\w-]+)/$', ResellerEditView.as_view(), name='reseller_edit'),
 
 	# Install server
 	url(r'^install/$', install_server, name='install_server'),
