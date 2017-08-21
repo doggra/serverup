@@ -45,7 +45,7 @@ class Profile(models.Model):
 		if self.account_type > 0:
 			return True
 		else:
-			mat = self.user.server_set.count() - self.user.customer.server_limit
+			mat = self.user.server_set.count() - self.user.customer.servers_limit
 			if mat < 0:
 				# Return remaining number of available servers
 				return -mat

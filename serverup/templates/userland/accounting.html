@@ -14,7 +14,12 @@
 {% endblock contentheader %}
 
 {% block content %}
-Soon ...
+	<p>
+		Your balance: {{ user.customer.credits }} credits.
+	</p>
+	<p>
+		<a href="#" class="btn btn-primary">Top up!</a>
+	</p>
 {% endblock content %}
 
 {% block extendfoot %}{% endblock extendfoot %}

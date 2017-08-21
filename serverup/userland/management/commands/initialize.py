@@ -17,6 +17,15 @@ class Command(BaseCommand):
         admin = user
         print("User {0} crated".format(user.username))
 
+        # Create administrator # 2
+        user = User(username="Administrator2", is_staff=True, is_superuser=True)
+        user.set_password('admin22017')
+        user.save()
+        profile = Profile(user=user, account_type=2)
+        profile.save()
+        admin = user
+        print("User {0} crated".format(user.username))
+
         # Create reseller.
         user = User(username="Reseller")
         user.set_password('resell2017')

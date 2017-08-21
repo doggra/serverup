@@ -49,9 +49,9 @@ class Servers(TemplateView):
 
 		# Get servers limit - (only customer) if not exists - show 0
 		try:
-			context['server_limit'] = self.request.user.customer.server_limit
+			context['servers_limit'] = self.request.user.customer.servers_limit
 		except Customer.DoesNotExist:
-			context['server_limit'] = 0
+			context['servers_limit'] = 0
 
 		return context
 
@@ -305,6 +305,8 @@ def install_server(request):
 				server = Server.objects.create(user=user[0],
 											   public_key=__VAR_SSH_KEY,
 											   private_key=private_key)
+
+				Event.objects.create(server=server, event_type=1)
 
 				__VAR_SERVER_UUID = str(server.uuid)
 

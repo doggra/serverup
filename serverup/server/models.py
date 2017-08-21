@@ -84,7 +84,7 @@ class Server(models.Model):
 
             # Add history event
             Event.objects.create(info=response,
-                                 extra_info="Command: ".format(command,),
+                                 extra_info="Command: {}".format(command,),
                                  server=self)
 
             return response

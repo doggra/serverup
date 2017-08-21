@@ -6,6 +6,7 @@ from django.db import models
 
 EVENT_TYPES = (
 	(0, 'SSH command sent'),
+	(1, 'Server added'),
 )
 
 
@@ -15,7 +16,7 @@ class Event(models.Model):
 												null=True)
 	
 	event_type = models.IntegerField(default=0, choices=EVENT_TYPES)
-	info = models.TextField()
+	info = models.TextField(default="")
 	extra_info = models.CharField(max_length=255, default="")
 
 	class Meta:
