@@ -83,16 +83,25 @@ class Server(models.Model):
             response = stdout.read()
 
             # Add history event
-            Event.objects.create(info=response, extra_info=command, server=self)
+            Event.objects.create(info=response,
+                                 extra_info="Command: ".format(command,),
+                                 server=self)
 
             return response
 
         except paramiko.AuthenticationException, e:
-            print "Authentication failed when connecting to %s" % self.hostname
+            # Add history event
+            ev = Event.objects.create(info=str(e),
+                                      extra_info="",
+                                      server=self)
+
             return "FAIL: {}".format(e)
 
         except Exception, e:
-            print "Could not SSH to %s" % self.hostname
+            # Add history event
+            ev = Event.objects.create(info=str(e),
+                                      extra_info="",
+                                      server=self)
             return "FAIL: {}".format(e)
 
         finally:
@@ -214,7 +223,6 @@ class Server(models.Model):
     def delete(self):
         # Send uninstall command to server on delete.
         r = self.send_command('/usr/local/bin/serverup-uninstall')
-        print(r)
         super(Server, self).delete()
 
     def __unicode__(self):
