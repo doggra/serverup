@@ -80,9 +80,8 @@ echo "Copying uninstallation script..."
 cat <<\EOT >> /usr/local/bin/serverup-uninstall
 #!/bin/bash
 # Deinstallation script
-if["$(id -u)"!="0"];then echo "This script must be run as root";fi
 rm /usr/local/bin/serverup-rsh &> /dev/null
-sed -i '/serverup/d'/etc/ssh/sshd_config &> /dev/null
+sed -i '/serverup/d' /etc/ssh/sshd_config &> /dev/null
 sed -i '/serverup/d' ~/.ssh/authorized_keys &> /dev/null
 rm /usr/local/bin/serverup-uninstall &> /dev/null
 exit 1
