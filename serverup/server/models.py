@@ -36,7 +36,7 @@ class Package(models.Model):
 
 
 class PackageUpdate(models.Model):
-    user = models.ForeignKey(User, blank=True)
+    user = models.ForeignKey(User, null=True)
     datetime = models.DateTimeField(auto_now_add=True)
     server = models.ForeignKey('Server', on_delete=models.CASCADE)
     package = models.ForeignKey(Package)
