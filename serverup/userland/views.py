@@ -301,7 +301,7 @@ def accounting_paypal(request):
 
     # What you want the button to do.
     paypal_dict = {
-        "business": "receiver_email@example.com",
+        "business": "radek@nuidi.com",
         "amount": "10000000.00",
         "item_name": "name of the item",
         "invoice": "unique-invoice-id",
@@ -348,12 +348,12 @@ def show_me_the_money(sender, **kwargs):
 @csrf_exempt
 @login_required
 def paypal_return(request):
-    return render('userland/paypal-return.html')
+    return render(request, 'userland/paypal-return.html')
 
 
 @login_required
 def paypal_cancel(request):
-    return render('userland/paypal-cancel.html')
+    return render(request, 'userland/paypal-cancel.html')
 
 
 valid_ipn_received.connect(show_me_the_money)
