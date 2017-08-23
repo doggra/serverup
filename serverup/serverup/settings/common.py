@@ -7,9 +7,9 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 PAYPAL_TEST = True
+PAYPAL_RECEIVER_EMAIL = 'hi-facilitator@nuidi.com'
 
 ### ADMINS CONFIG ###############################
-
 
 admin.site.site_header = 'ServerUP'
 admin.site.site_title = 'ServerUP'

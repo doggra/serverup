@@ -301,7 +301,7 @@ def accounting_paypal(request):
 
     # What you want the button to do.
     paypal_dict = {
-        "business": "radek@nuidi.com",
+        "business": settings.PAYPAL_RECEIVER_EMAIL,
         "amount": "10000000.00",
         "item_name": "name of the item",
         "invoice": "unique-invoice-id",
@@ -317,10 +317,12 @@ def accounting_paypal(request):
     return render(request, "userland/accounting_paypal.html", context)
 
 
-
-@login_required
 def show_me_the_money(sender, **kwargs):
+
     ipn_obj = sender
+
+    print(ipn_obj)
+
     if ipn_obj.payment_status == ST_PP_COMPLETED:
         # WARNING !
         # Check that the receiver email is the same we previously
@@ -339,7 +341,7 @@ def show_me_the_money(sender, **kwargs):
         #     price = ...
         # else:
         #     price = ...
-        print(ipn_obj)
+        print('complete!')
     #     if ipn_obj.mc_gross == price and ipn.mc_currency == 'USD':
     #         ...
     # else:
