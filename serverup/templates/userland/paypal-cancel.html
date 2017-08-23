@@ -9,17 +9,15 @@
       Accounting
     </h1>
     <ol class="breadcrumb">
-      <li><a href="#"><i class="fa fa-usd"></i> Accounting</a></li>
+      <li><a href="#"><i class="fa fa-usd"></i> PayPal</a></li>
+      <li><a href="#"><i class="fa fa-usd"></i> Return</a></li>
     </ol>
 {% endblock contentheader %}
 
 {% block content %}
-	<p>
-		Your balance: {{ user.customer.credits|default:0 }} credits.
-	</p>
-	<p>
-		<a href="{% url 'accounting_paypal' %}" class="btn btn-primary">Top up!</a>
-	</p>
+
+Canceled !
+
 {% endblock content %}
 
 {% block extendfoot %}{% endblock extendfoot %}

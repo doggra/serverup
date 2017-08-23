@@ -4,7 +4,7 @@ from django.contrib import admin
 from userland.views import Dashboard, OwnProfile, OwnProfileEdit, History, LoginView, \
 				   LogoutView, ChangePasswordView, CustomerListView, ResellerListView, \
 				   Accounting, CustomerEditView, ResellerEditView, create_customer, \
-				   create_reseller
+				   create_reseller, accounting_paypal, paypal_return, paypal_cancel
 
 from django.contrib.auth import views as auth_views
 
@@ -30,6 +30,11 @@ urlpatterns = [
 	# App
 	url(r'^server/', include('server.urls')),
 	url(r'^accounting/$', Accounting.as_view(), name='accounting'),
+	url(r'^accounting/paypal/$', accounting_paypal, name='accounting_paypal'),
+
+	url(r'^paypal/', include('paypal.standard.ipn.urls')),
+	url(r'^paypal/return/$', paypal_return, name='paypal-return-view'),
+	url(r'^paypal/cancel/$', paypal_cancel, name='paypal-cancel-view'),
 
 	url(r'^customer/list/$', CustomerListView.as_view(), name='customer_list'),
 	url(r'^customer/create/$', create_customer, name='create_customer'),

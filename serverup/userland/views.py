@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+
 from django.urls import reverse
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
@@ -12,16 +13,20 @@ from django.contrib.auth import views as auth_views
 from django.views.generic import View, TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView
-
+from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+
+from django.contrib.auth.decorators import user_passes_test
+from django.core.exceptions import PermissionDenied
 
 from .models import Profile, Customer, Reseller
 from .forms import OwnProfileEditForm, UserEditForm
 from server.models import Server, PackageUpdate
 
-from django.contrib.auth.decorators import user_passes_test
-from django.core.exceptions import PermissionDenied
+from paypal.standard.models import ST_PP_COMPLETED
+from paypal.standard.ipn.signals import valid_ipn_received
+from paypal.standard.forms import PayPalPaymentsForm
 
 
 @method_decorator(login_required, name='dispatch')
@@ -284,3 +289,71 @@ def create_reseller(request):
 @method_decorator(login_required, name='dispatch')
 class Accounting(TemplateView):
     template_name = "userland/accounting.html"
+
+
+# @method_decorator(login_required, name='dispatch')
+# class AccountingPayPal(TemplateView):
+#     template_name = "userland/accounting_paypal.html"
+
+
+@login_required
+def accounting_paypal(request):
+
+    # What you want the button to do.
+    paypal_dict = {
+        "business": "receiver_email@example.com",
+        "amount": "10000000.00",
+        "item_name": "name of the item",
+        "invoice": "unique-invoice-id",
+        "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+        "return_url": request.build_absolute_uri(reverse('paypal-return-view')),
+        "cancel_return": request.build_absolute_uri(reverse('paypal-cancel-view')),
+        "custom": "premium_plan",  # Custom command to correlate to some function later (optional)
+    }
+
+    # Create the instance.
+    form = PayPalPaymentsForm(initial=paypal_dict)
+    context = {"form": form}
+    return render(request, "userland/accounting_paypal.html", context)
+
+
+
+@login_required
+def show_me_the_money(sender, **kwargs):
+    ipn_obj = sender
+    if ipn_obj.payment_status == ST_PP_COMPLETED:
+        # WARNING !
+        # Check that the receiver email is the same we previously
+        # set on the `business` field. (The user could tamper with
+        # that fields on the payment form before it goes to PayPal)
+        if ipn_obj.receiver_email != "receiver_email@example.com":
+            # Not a valid payment
+            return
+
+        # ALSO: for the same reason, you need to check the amount
+        # received, `custom` etc. are all what you expect or what
+        # is allowed.
+
+        # Undertake some action depending upon `ipn_obj`.
+        # if ipn_obj.custom == "premium_plan":
+        #     price = ...
+        # else:
+        #     price = ...
+        print(ipn_obj)
+    #     if ipn_obj.mc_gross == price and ipn.mc_currency == 'USD':
+    #         ...
+    # else:
+    #     #...
+
+@csrf_exempt
+@login_required
+def paypal_return(request):
+    return render('userland/paypal-return.html')
+
+
+@login_required
+def paypal_cancel(request):
+    return render('userland/paypal-cancel.html')
+
+
+valid_ipn_received.connect(show_me_the_money)

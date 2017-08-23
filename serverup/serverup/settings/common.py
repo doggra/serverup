@@ -6,6 +6,8 @@ from django.contrib import admin
 DEBUG = False
 ALLOWED_HOSTS = ['*']
 
+PAYPAL_TEST = True
+
 ### ADMINS CONFIG ###############################
 
 
@@ -52,6 +54,7 @@ DEFAULT_APPS = [
     'server',
     'serverup',
     'history',
+    'paypal.standard.ipn',
 ]
 
 ### MIDDLEWARES CONFIG  #########################
