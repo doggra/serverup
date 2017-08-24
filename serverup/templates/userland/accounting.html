@@ -18,7 +18,7 @@
 		Your balance: {{ user.customer.credits|default:0 }} credits.
 	</p>
 	<p>
-		<a href="{% url 'accounting_paypal' %}" class="btn btn-primary">Top up!</a>
+		{{ pp_form.render }}
 	</p>
 {% endblock content %}
 

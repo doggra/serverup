@@ -294,9 +294,22 @@ class Accounting(TemplateView):
     template_name = "userland/accounting.html"
 
 
-# @method_decorator(login_required, name='dispatch')
-# class AccountingPayPal(TemplateView):
-#     template_name = "userland/accounting_paypal.html"
+    def get_context_data(self, **kwargs):
+        context = super(Accounting, self).get_context_data(**kwargs)
+
+        paypal_dict = {
+            "business": settings.PAYPAL_RECEIVER_EMAIL,
+            "amount": 100.00,
+            "item_name": "name of the item",
+            "invoice": "unique-invoice-id",
+            "notify_url": self.request.build_absolute_uri(reverse('paypal-ipn')),
+            "return_url": self.request.build_absolute_uri(reverse('paypal-return-view')),
+            "cancel_return": self.request.build_absolute_uri(reverse('paypal-cancel-view')),
+        }
+
+        context['pp_form'] = PayPalPaymentsForm(initial=paypal_dict)
+
+        return context
 
 
 @login_required
