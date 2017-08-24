@@ -3,12 +3,14 @@ from django.contrib import admin
 
 from userland.views import Dashboard, OwnProfile, OwnProfileEdit, History, LoginView, \
 				   LogoutView, ChangePasswordView, CustomerListView, ResellerListView, \
-				   Accounting, CustomerEditView, ResellerEditView, create_customer, \
-				   create_reseller, accounting_paypal, paypal_return, paypal_cancel
+				   Accounting, CustomerEditView, accounting_paypal, paypal_return, \
+				   paypal_cancel, CustomerCreateView, ResellerCreateView, \
+				   CustomerDeleteView, ResellerDeleteView, ResellerEditView
 
 from django.contrib.auth import views as auth_views
 
 from server.views import PackageUpdateListView, install_server
+
 
 urlpatterns = [
 
@@ -37,11 +39,13 @@ urlpatterns = [
 	url(r'^paypal/cancel/$', paypal_cancel, name='paypal-cancel-view'),
 
 	url(r'^customer/list/$', CustomerListView.as_view(), name='customer_list'),
-	url(r'^customer/create/$', create_customer, name='create_customer'),
+	url(r'^customer/create/$', CustomerCreateView.as_view(), name='customer_create'),
+	url(r'^customer/delete/(?P<uuid>[\w-]+)/$', CustomerDeleteView.as_view(), name='customer_delete'),
 	url(r'^customer/edit/(?P<uuid>[\w-]+)/$', CustomerEditView.as_view(), name='customer_edit'),
 
-	url(r'^reseller/create/$', create_reseller, name='create_reseller'),
+	url(r'^reseller/create/$', ResellerCreateView.as_view(), name='reseller_create'),
 	url(r'^reseller/list/$', ResellerListView.as_view(), name='reseller_list'),
+	url(r'^reseller/delete/(?P<uuid>[\w-]+)/$', ResellerDeleteView.as_view(), name='reseller_delete'),
 	url(r'^reseller/edit/(?P<uuid>[\w-]+)/$', ResellerEditView.as_view(), name='reseller_edit'),
 
 	# Install server

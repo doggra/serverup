@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block menu_resellers %}active{% endblock %}
+
+{% block content %}
+<h2>Delete user</h2>
+<h3>Are you sure you want to delete "{{ object.username }}"?</h3>
+<form method="POST">
+{% csrf_token %}
+<input type="submit" value="Yes" class="btn btn-success" />
+<a href="{% url 'reseller_list' %}" class="btn btn-danger">No, cancel</a>
+</form>
+{% endblock %}

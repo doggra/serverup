@@ -6,8 +6,8 @@ from django.contrib import admin
 DEBUG = False
 ALLOWED_HOSTS = ['*']
 
-PAYPAL_TEST = True
-PAYPAL_RECEIVER_EMAIL = 'hi-facilitator@nuidi.com'
+PAYPAL_TEST = False
+PAYPAL_RECEIVER_EMAIL = 'hi@nuidi.com'
 
 ### ADMINS CONFIG ###############################
 

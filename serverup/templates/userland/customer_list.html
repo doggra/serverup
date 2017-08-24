@@ -16,54 +16,9 @@
 {% endblock contentheader %}
 
 {% block content %}
-
-<!-- Modal -->
-<div class="modal fade" id="create_customer" tabindex="-1" role="dialog" aria-labelledby="create_customer">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="create_customer">Create new customer</h4>
-      </div>
-      <form action="{% url 'create_customer' %}" method="POST">
-      {% csrf_token %}
-      <div class="modal-body">
-
-        {{ user_form|as_bootstrap }}
-
-        <p>
-          <label for="password">Password</label>
-          <input type="text" id="password" class="form-control" name="password" required>
-        </p>
-
-        {% if user.profile.account_type == 2 %}
-        <p>
-          <label for="reseller">Reseller</label>
-          <select class="form-control" id="reseller" name="reseller">
-              <option value="">---</option>
-            {% for reseller in resellers %}
-              <option value="{{ reseller.user.pk }}">{{ reseller.user }}</option>
-            {% endfor %}
-          </select>
-        </p>
-        {% endif %}
-
-        <p>
-          <label for="servers_limit">Servers limit</label>
-          <input class="form-control" name="servers_limit" type="number" min="1" value="1" required>
-        </p>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Create</button>
-      </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<button class="btn btn-primary" data-toggle="modal" data-target="#create_customer"><i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Create new customer</button>
+<a href="{% url 'customer_create' %}" class="btn btn-primary">
+  <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Create new customer
+</a>
 
 <div id="customers" class="box">
   <div class="box-body">
@@ -77,6 +32,7 @@
             <th class="text-center">Servers</th>
             <th class="text-center" title="Servers limit">Limit&nbsp;&nbsp;(<i class="fa fa-server"></i>)</th>
             <th class="text-center">Edit</th>
+            <th class="text-center">Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -89,6 +45,7 @@
               <td class="text-center">{{ customer.user.server_set.count }}</td>
               <td class="text-center">{{ customer.servers_limit }}</td>
               <td class="text-center"><a href="{% url 'customer_edit' customer.user.profile.uuid %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
+              <td class="text-center"><a href="{% url 'customer_delete' customer.user.profile.uuid %}" class="table-btn btn btn-danger btn-sm"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
             </tr>
             {% empty %}
             <tr>

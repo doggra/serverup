@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% load staticfiles bootstrap_forms %}
+
+{% block menu_reseller %}active{% endblock %}
+
+{% block contentheader %}
+    <h1>
+      Reseller
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#">Create</a></li>
+    </ol>
+{% endblock contentheader %}
+
+{% block content %}
+<form method="POST">
+{% csrf_token %}
+
+{{ form|as_bootstrap }}
+
+<input type="submit" class="btn btn-primary" value="Create" />
+<a href="{% url 'reseller_list' %}" class="btn btn-danger">Cancel</a>
+
+</form>
+{% endblock content %}
+
+{% block extendfoot %}{% endblock extendfoot %}

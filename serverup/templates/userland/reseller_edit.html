@@ -17,19 +17,11 @@
 {% block content %}
 <div class="box">
   <div class="box-body">
+    {{ form.non_field_errors }}
     <form method="POST">
       {% csrf_token %}
 
       {{ form|as_bootstrap }}
-      <p>
-        <label for="servers_limit">Customers limit</label>
-        <input class="form-control" name="customers_limit" type="number" min="1" value="1">
-      </p>
-
-      <p>
-        <label for="new_password">New password</label>
-        <input type="password" id="new_password" class="form-control" name="new_password">
-      </p>
 
       <div class="form-group">
         <button type="submit" class="btn btn-success">Submit</button>

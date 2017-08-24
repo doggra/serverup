@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -12,7 +12,8 @@ from django.contrib.auth import views as auth_views
 
 from django.views.generic import View, TemplateView
 from django.views.generic.list import ListView
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import FormView, CreateView
+from django.views.generic.edit import UpdateView, DeleteView
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -21,7 +22,10 @@ from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
 
 from .models import Profile, Customer, Reseller
-from .forms import OwnProfileEditForm, UserEditForm
+from .forms import CustomerForm
+from .forms import ResellerForm
+from .forms import OwnProfileEditForm
+
 from server.models import Server, PackageUpdate
 
 from paypal.standard.models import ST_PP_COMPLETED
@@ -43,10 +47,11 @@ class Dashboard(TemplateView):
 
         if self.request.user.profile.account_type == 1:
             context['customers_count'] = Customer.objects.filter(\
-                                        reseller=self.request.user).count()
+                                        reseller=self.request.user,
+                                        user_is_active=True).count()
         elif self.request.user.profile.account_type == 2:
-            context['customers_count'] = Customer.objects.count()
-            context['resellers_count'] = Reseller.objects.count()
+            context['customers_count'] = Customer.objects.filter(user__is_active=True).count()
+            context['resellers_count'] = Reseller.objects.filter(user__is_active=True).count()
 
         return context
 
@@ -112,13 +117,45 @@ class ChangePasswordView(auth_views.PasswordChangeView):
 
 
 @method_decorator(login_required, name='dispatch')
+class CustomerCreateView(FormView):
+    form_class = CustomerForm
+    template_name = 'userland/customer_create.html'
+    success_url = reverse_lazy('customer_list')
+
+    def form_valid(self, form):
+        form.save()
+        return super(CustomerCreateView, self).form_valid(form)
+
+
+@method_decorator(login_required, name='dispatch')
+class CustomerDeleteView(DeleteView):
+    model = User
+    success_url = reverse_lazy('customer_list')
+
+    def get_object(self):
+        acc_type = self.request.user.profile.account_type
+        profile = get_object_or_404(Profile, uuid=self.kwargs['uuid'])
+        if acc_type == 0:
+            raise PermissionDenied
+        if acc_type == 1:
+            if profile.user.customer.reseller != self.request.user:
+                raise PermissionDenied
+        return profile.user
+
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.is_active = False
+        user.save()
+        return HttpResponseRedirect(reverse_lazy('customer_list'))
+
+
+@method_decorator(login_required, name='dispatch')
 class CustomerListView(ListView):
     model = Customer
 
     def get_context_data(self, **kwargs):
         context = super(CustomerListView, self).get_context_data(**kwargs)
-        context['user_form'] = UserEditForm()
-        context['resellers'] = Reseller.objects.all()
+        context['resellers'] = Reseller.objects.filter(user__is_active=True)
         return context
 
     def get_queryset(self):
@@ -126,9 +163,59 @@ class CustomerListView(ListView):
         if acc_type == 0:
             raise PermissionDenied
         elif acc_type == 1:
-            return Customer.objects.filter(reseller=self.request.user)
+            return Customer.objects.filter(reseller=self.request.user,
+                                           user__is_active=True)
         elif acc_type == 2:
-            return Customer.objects.all()
+            return Customer.objects.filter(user__is_active=True)
+
+
+@method_decorator(login_required, name='dispatch')
+class CustomerEditView(FormView):
+    form_class = CustomerForm
+    template_name = 'userland/customer_edit.html'
+    success_url = reverse_lazy('customer_list')
+
+    def post(self, request, uuid):
+        user = self.get_object()
+        form = CustomerForm(request.POST, instance=user)
+        form.fields['password'].required = False
+
+        if form.is_valid():
+            data = form.cleaned_data
+            user.username = data['username']
+            user.email = data['email']
+            user.first_name = data['first_name']
+            user.last_name = data['last_name']
+            user.email = data['email']
+            user.save()
+            user.customer.reseller = data['reseller']
+            user.customer.servers_limit = data['limit']
+            user.customer.save()
+
+        return HttpResponseRedirect(reverse('customer_list'))
+
+    def get_object(self):
+        profile = get_object_or_404(Profile, uuid=self.kwargs['uuid'])
+        return profile.user
+
+    def get_form(self):
+        user = self.get_object()
+        form = CustomerForm(instance=user,
+                            initial={'limit': user.customer.servers_limit,
+                                     'reseller': user.customer.reseller})
+        del form.fields['password']
+        return form
+
+
+@method_decorator(login_required, name='dispatch')
+class ResellerCreateView(FormView):
+    form_class = ResellerForm
+    template_name = 'userland/reseller_create.html'
+    success_url = reverse_lazy('reseller_list')
+
+    def form_valid(self, form):
+        form.save()
+        return super(ResellerCreateView, self).form_valid(form)
 
 
 @method_decorator(login_required, name='dispatch')
@@ -137,7 +224,6 @@ class ResellerListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ResellerListView, self).get_context_data(**kwargs)
-        context['user_form'] = UserEditForm()
         return context
 
     def get_queryset(self):
@@ -145,145 +231,62 @@ class ResellerListView(ListView):
         if acc_type == 0 or acc_type == 1:
             raise PermissionDenied
         elif acc_type == 2:
-            return Reseller.objects.all()
+            return Reseller.objects.filter(user__is_active=True)
 
 
 @method_decorator(login_required, name='dispatch')
-class ResellerEditView(TemplateView):
-    template_name = "userland/reseller_edit.html"
+class ResellerDeleteView(DeleteView):
+    model = User
+    success_url = reverse_lazy('reseller_list')
 
-    def get_context_data(self, **kwargs):
-        context = super(ResellerEditView, self).get_context_data(**kwargs)
-        profile = get_object_or_404(Profile, uuid=kwargs['uuid'])
-        context['reseller'] = profile.user.reseller
-        context['form'] = UserEditForm(instance=profile.user)
-        return context
+    def get_object(self):
+        acc_type = self.request.user.profile.account_type
+        profile = get_object_or_404(Profile, uuid=self.kwargs['uuid'])
+        if acc_type in [0, 1]:
+            raise PermissionDenied
+        return profile.user
+
+    def delete(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.is_active = False
+        user.save()
+        return HttpResponseRedirect(reverse_lazy('reseller_list'))
+
+
+@method_decorator(login_required, name='dispatch')
+class ResellerEditView(FormView):
+    form_class = ResellerForm
+    template_name = 'userland/reseller_edit.html'
+    success_url = reverse_lazy('reseller_list')
 
     def post(self, request, uuid):
-        profile = get_object_or_404(Profile, uuid=uuid)
-        form = UserEditForm(instance=profile.user, data=request.POST)
-        if form.is_valid:
-            user = form.save()
+        user = self.get_object()
+        form = ResellerForm(request.POST, instance=user)
+        form.fields['password'].required = False
 
-            # Set new password if changed.
-            new_pass = request.POST.get('new_password', '')
-            if new_pass != '':
-                user.set_password(new_pass)
-                user.save()
-
-            reseller = Reseller.objects.get(user=user)
-            new_limit = request.POST.get('customers_limit', None)
-
-            if new_limit:
-                reseller.customers_limit = new_limit
-                reseller.save()
-
-            reseller.save()
+        if form.is_valid():
+            data = form.cleaned_data
+            user.username = data['username']
+            user.email = data['email']
+            user.first_name = data['first_name']
+            user.last_name = data['last_name']
+            user.email = data['email']
+            user.save()
+            user.reseller.customers_limit = data['limit']
+            user.reseller.save()
 
         return HttpResponseRedirect(reverse('reseller_list'))
 
+    def get_object(self):
+        profile = get_object_or_404(Profile, uuid=self.kwargs['uuid'])
+        return profile.user
 
-@method_decorator(login_required, name='dispatch')
-class CustomerEditView(TemplateView):
-    template_name = "userland/customer_edit.html"
-
-    def get_context_data(self, **kwargs):
-        context = super(CustomerEditView, self).get_context_data(**kwargs)
-        profile = get_object_or_404(Profile, uuid=kwargs['uuid'])
-        context['customer'] = profile.user.customer
-        context['form'] = UserEditForm(instance=profile.user)
-        context['resellers'] = Reseller.objects.all()
-
-        # Let in only administrator or reseller assigned to that customer.
-        acc_type = self.request.user.profile.account_type
-        if acc_type == 0:
-            raise PermissionDenied
-        elif acc_type == 1:
-            if self.request.user != context['customer'].reseller:
-                raise PermissionDenied
-        return context
-
-    def post(self, request, uuid):
-        profile = get_object_or_404(Profile, uuid=uuid)
-        form = UserEditForm(instance=profile.user, data=request.POST)
-        if form.is_valid:
-            user = form.save()
-
-            # Set new password if changed.
-            new_pass = request.POST.get('new_password', '')
-            if new_pass != '':
-                user.set_password(new_pass)
-                user.save()
-
-            customer = Customer.objects.get(user=user)
-            new_limit = request.POST.get('servers_limit', None)
-
-            if new_limit:
-                customer.servers_limit = new_limit
-                customer.save()
-
-            reseller_pk = request.POST.get('reseller', None)
-
-            if reseller_pk:
-                reseller = User.objects.get(pk=reseller_pk)
-                customer.reseller = reseller
-
-            customer.save()
-
-        return HttpResponseRedirect(reverse('customer_list'))
-
-
-@login_required
-def create_customer(request):
-    if request.method == 'POST':
-        user_form = UserEditForm(data=request.POST)
-
-        if user_form.is_valid():
-            user = User.objects.create_user(user_form.cleaned_data['username'], 
-                                            user_form.cleaned_data['email'],
-                                            request.POST.get('password', ''),
-                                            last_name=user_form.cleaned_data['last_name'])
-
-            # Check if servers limit is more than 0 (Customers must have servers limit).
-            # Create customer and profile objects.
-            lmt = request.POST.get('servers_limit', 1)
-            if request.user.profile.account_type == 2:
-                reseller = Reseller.objects.get(user=request.POST.get('reseller', None)).user
-            else:
-                reseller = request.user
-
-            profile = Profile.objects.create(user=user, account_type=0)
-            Customer.objects.create(user=user, 
-                                    servers_limit=max(1,lmt),
-                                    reseller=reseller)
-
-        else:
-            print(user_form.errors)
-
-    return HttpResponseRedirect(reverse('customer_list'))
-
-
-@login_required
-def create_reseller(request):
-    if request.method == 'POST':
-        user_form = UserEditForm(data=request.POST)
-
-        if user_form.is_valid():
-            user = User.objects.create_user(user_form.cleaned_data['username'], 
-                                            user_form.cleaned_data['email'],
-                                            request.POST.get('password', ''),
-                                            last_name=user_form.cleaned_data['last_name'])
-
-            # Create reseller and profile objects.
-            lmt = request.POST.get('customers_limit', 1)
-            profile = Profile.objects.create(user=user, account_type=1)
-            Reseller.objects.create(user=user, 
-                                    customers_limit=max(1,lmt))
-
-        else:
-            print(user_form.errors)
-
-    return HttpResponseRedirect(reverse('reseller_list'))
+    def get_form(self):
+        user = self.get_object()
+        form = ResellerForm(instance=user,
+                            initial={'limit': user.reseller.customers_limit})
+        del form.fields['password']
+        return form
 
 
 @method_decorator(login_required, name='dispatch')
@@ -302,13 +305,12 @@ def accounting_paypal(request):
     # What you want the button to do.
     paypal_dict = {
         "business": settings.PAYPAL_RECEIVER_EMAIL,
-        "amount": "10000000.00",
+        "amount": 100.00,
         "item_name": "name of the item",
         "invoice": "unique-invoice-id",
         "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
         "return_url": request.build_absolute_uri(reverse('paypal-return-view')),
         "cancel_return": request.build_absolute_uri(reverse('paypal-cancel-view')),
-        "custom": "premium_plan",  # Custom command to correlate to some function later (optional)
     }
 
     # Create the instance.
@@ -320,7 +322,6 @@ def accounting_paypal(request):
 def show_me_the_money(sender, **kwargs):
 
     ipn_obj = sender
-
     print(ipn_obj)
 
     if ipn_obj.payment_status == ST_PP_COMPLETED:

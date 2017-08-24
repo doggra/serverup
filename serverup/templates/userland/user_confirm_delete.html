@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block menu_customers %}active{% endblock %}
+
+{% block content %}
+<h3>Are you sure you want to user "{{ object.username }}"?</h3>
+<form method="POST">
+{% csrf_token %}
+<input type="submit" value="Yes" class="btn btn-success" />
+<a href="{% url 'customer_list' %}" class="btn btn-danger">No, cancel</a>
+</form>
+{% endblock %}

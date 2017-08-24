@@ -5,7 +5,7 @@
 {% block contentheader %}
   <h1>
     Customer edit
-    <small>{{ customer.user.username }}</small>
+    <small>{{ object.user.username }}</small>
   </h1>
   
   <ol class="breadcrumb">
@@ -17,31 +17,11 @@
 {% block content %}
 <div class="box">
   <div class="box-body">
+    {{ form.non_field_errors }}
     <form method="POST">
       {% csrf_token %}
 
       {{ form|as_bootstrap }}
-
-      {% if user.profile.account_type == 2 %}
-      <p>
-        <label for="reseller">Reseller</label>
-        <select class="form-control" id="reseller" name="reseller">
-          {% for reseller in resellers %}
-            <option value="{{ reseller.user.pk }}">{{ reseller.user }}</option>
-          {% endfor %}
-        </select>
-      </p>
-      {% endif %}
-
-      <p>
-        <label for="servers_limit">Servers limit</label>
-        <input class="form-control" name="servers_limit" type="number" min="1" value="1">
-      </p>
-
-      <p>
-        <label for="new_password">New password</label>
-        <input type="password" id="new_password" class="form-control" name="new_password">
-      </p>
 
       <div class="form-group">
         <button type="submit" class="btn btn-success">Submit</button>

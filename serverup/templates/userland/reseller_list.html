@@ -17,42 +17,9 @@
 
 {% block content %}
 
-<!-- Modal -->
-<div class="modal fade" id="create_reseller" tabindex="-1" role="dialog" aria-labelledby="create_reseller">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="create_reseller">Create new reseller</h4>
-      </div>
-      <form action="{% url 'create_reseller' %}" method="POST">
-      {% csrf_token %}
-      <div class="modal-body">
-
-        {{ user_form|as_bootstrap }}
-
-        <p>
-          <label for="password">Password</label>
-          <input type="text" id="password" class="form-control" name="password">
-        </p>
-
-        <p>
-          <label for="servers_limit">Customers limit</label>
-          <input class="form-control" name="servers_limit" type="number" min="1" value="1">
-        </p>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Create</button>
-      </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-
-<button class="btn btn-primary" data-toggle="modal" data-target="#create_reseller"><i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Create new reseller</button>
+<a class="btn btn-primary" href="{% url 'reseller_create' %}">
+  <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Create new reseller
+</a>
 
 <div id="resellers" class="box">
   <div class="box-body">
@@ -64,7 +31,8 @@
             <th>E-mail</th>
             <th class="text-center">Customers</th>
             <th class="text-center" title="Customers limit">Limit&nbsp;&nbsp;(<i class="fa fa-user-circle-o"></i>)</th>
-            <th></th>
+            <th class="text-center">Edit</th>
+            <th class="text-center">Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -76,6 +44,7 @@
               <td class="text-center">{{ reseller.user.customer_set.count|default:0 }}</td>
               <td class="text-center">{{ reseller.customers_limit }}</td>
               <td class="text-center"><a href="{% url 'reseller_edit' reseller.user.profile.uuid %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
+              <td class="text-center"><a href="{% url 'reseller_delete' reseller.user.profile.uuid %}" class="table-btn btn btn-danger btn-sm"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
             </tr>
             {% empty %}
             <tr>
