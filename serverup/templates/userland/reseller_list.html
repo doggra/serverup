@@ -28,9 +28,11 @@
           <tr>
             <th style="width:24px;"></th>
             <th>Username</th>
+            <th>UUID</th>
             <th>E-mail</th>
             <th class="text-center">Customers</th>
-            <th class="text-center" title="Customers limit">Limit&nbsp;&nbsp;(<i class="fa fa-user-circle-o"></i>)</th>
+            <th class="text-center">Servers</th>
+            <th class="text-center">Base credits</th>
             <th class="text-center">Edit</th>
             <th class="text-center">Delete</th>
           </tr>
@@ -40,9 +42,15 @@
             <tr>
               <td><i class="fa fa-user"></i></td>
               <td>{{ reseller.user.username }}</td>
+              <td>{{ reseller.user.profile.uuid }}</td>
               <td>{{ reseller.user.email }}</td>
-              <td class="text-center">{{ reseller.user.customer_set.count|default:0 }}</td>
-              <td class="text-center">{{ reseller.customers_limit }}</td>
+              <td class="text-center">
+                {{ reseller.user.customer_set.count|default:0 }} / {{ reseller.customers_limit }}
+              </td>
+              <td class="text-center">
+                {{ reseller.user.server_set.count }} / {{ reseller.servers_limit }}
+              </td>
+              <th class="text-center">{{ reseller.base_credits }}</th>
               <td class="text-center"><a href="{% url 'reseller_edit' reseller.user.profile.uuid %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
               <td class="text-center"><a href="{% url 'reseller_delete' reseller.user.profile.uuid %}" class="table-btn btn btn-danger btn-sm"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
             </tr>

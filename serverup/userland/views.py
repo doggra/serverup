@@ -48,10 +48,11 @@ class Dashboard(TemplateView):
         if self.request.user.profile.account_type == 1:
             context['customers_count'] = Customer.objects.filter(\
                                         reseller=self.request.user,
-                                        user_is_active=True).count()
+                                        user__is_active=True).count()
         elif self.request.user.profile.account_type == 2:
             context['customers_count'] = Customer.objects.filter(user__is_active=True).count()
             context['resellers_count'] = Reseller.objects.filter(user__is_active=True).count()
+            context['servers_count'] = Server.objects.all().count()
 
         return context
 
@@ -177,7 +178,10 @@ class CustomerEditView(FormView):
 
     def post(self, request, uuid):
         user = self.get_object()
-        form = CustomerForm(request.POST, instance=user)
+        if request.user.profile.account_type == 2:
+            form = CustomerForm(False, request.POST, instance=user)
+        else:
+            form = CustomerForm(True, request.POST, instance=user)
         form.fields['password'].required = False
 
         if form.is_valid():
@@ -187,9 +191,11 @@ class CustomerEditView(FormView):
             user.first_name = data['first_name']
             user.last_name = data['last_name']
             user.email = data['email']
+            user.is_active = data['is_active']
             user.save()
-            user.customer.reseller = data['reseller']
-            user.customer.servers_limit = data['limit']
+            if request.user.profile.account_type == 2:
+                user.customer.reseller = data['reseller']
+            user.customer.servers_limit = data['servers_limit']
             user.customer.save()
 
         return HttpResponseRedirect(reverse('customer_list'))
@@ -200,8 +206,9 @@ class CustomerEditView(FormView):
 
     def get_form(self):
         user = self.get_object()
-        form = CustomerForm(instance=user,
-                            initial={'limit': user.customer.servers_limit,
+        form = CustomerForm(True,
+                            instance=user,
+                            initial={'servers_limit': user.customer.servers_limit,
                                      'reseller': user.customer.reseller})
         del form.fields['password']
         return form
@@ -228,7 +235,7 @@ class ResellerListView(ListView):
 
     def get_queryset(self):
         acc_type = self.request.user.profile.account_type
-        if acc_type == 0 or acc_type == 1:
+        if acc_type == 0:
             raise PermissionDenied
         elif acc_type == 2:
             return Reseller.objects.filter(user__is_active=True)
@@ -272,7 +279,8 @@ class ResellerEditView(FormView):
             user.last_name = data['last_name']
             user.email = data['email']
             user.save()
-            user.reseller.customers_limit = data['limit']
+            user.reseller.customers_limit = data['customers_limit']
+            user.reseller.servers_limit = data['servers_limit']
             user.reseller.save()
 
         return HttpResponseRedirect(reverse('reseller_list'))
@@ -284,7 +292,8 @@ class ResellerEditView(FormView):
     def get_form(self):
         user = self.get_object()
         form = ResellerForm(instance=user,
-                            initial={'limit': user.reseller.customers_limit})
+                            initial={'customers_limit': user.reseller.customers_limit,
+                                     'servers_limit': user.reseller.servers_limit})
         del form.fields['password']
         return form
 

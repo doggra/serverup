@@ -76,13 +76,10 @@ class Server(models.Model):
             pkey = paramiko.RSAKey.from_private_key(\
                                         StringIO.StringIO(self.private_key))
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-            # Make connection, send command and return response.
             ssh.connect(hostname=self.ip, username='root', pkey=pkey)
             stdin, stdout, stderr = ssh.exec_command(command)
             response = stdout.read()
 
-            # Add history event
             Event.objects.create(info=response,
                                  extra_info="Command: {}".format(command,),
                                  server=self)
@@ -90,18 +87,17 @@ class Server(models.Model):
             return response
 
         except paramiko.AuthenticationException, e:
-            # Add history event
-            ev = Event.objects.create(info=str(e),
-                                      extra_info="",
-                                      server=self)
+            Event.objects.create(info=str(e),
+                                 extra_info="",
+                                 server=self)
 
             return "FAIL: {}".format(e)
 
         except Exception, e:
             # Add history event
-            ev = Event.objects.create(info=str(e),
-                                      extra_info="",
-                                      server=self)
+            Event.objects.create(info=str(e),
+                                 extra_info="",
+                                 server=self)
             return "FAIL: {}".format(e)
 
         finally:
@@ -110,9 +106,11 @@ class Server(models.Model):
     def update(self, package=None):
         """ Function for updating packages
         """
+        # Install specified package.
         if package:
             query = package
             to_update = package.package.name
+        # Update all packages
         else:
             query = PackageUpdate.objects.filter(server=self, ignore=False)
             to_update = " ".join(list(query.values_list('package__name',

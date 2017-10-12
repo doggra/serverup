@@ -27,10 +27,11 @@
           <tr>
             <th style="width:24px;"></th>
             <th>Username</th>
+            <th>UUID</th>
             <th>Reseller</th>
             <th>E-mail</th>
             <th class="text-center">Servers</th>
-            <th class="text-center" title="Servers limit">Limit&nbsp;&nbsp;(<i class="fa fa-server"></i>)</th>
+            <th class="text-center">Base credits</th>
             <th class="text-center">Edit</th>
             <th class="text-center">Delete</th>
           </tr>
@@ -40,10 +41,13 @@
             <tr>
               <td><i class="fa fa-user"></i></td>
               <td>{{ customer.user.username }}</td>
+              <td>{{ customer.user.profile.uuid }}</td>
               <td>{{ customer.reseller }}</td>
               <td>{{ customer.user.email }}</td>
-              <td class="text-center">{{ customer.user.server_set.count }}</td>
-              <td class="text-center">{{ customer.servers_limit }}</td>
+              <td class="text-center">
+                {{ customer.user.server_set.count }} / {{ customer.servers_limit }}
+              </td>
+              <th class="text-center">{{ customer.base_credits }}</th>
               <td class="text-center"><a href="{% url 'customer_edit' customer.user.profile.uuid %}" class="table-btn btn btn-primary btn-sm"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
               <td class="text-center"><a href="{% url 'customer_delete' customer.user.profile.uuid %}" class="table-btn btn btn-danger btn-sm"><i class="fa fa-trash" aria-hidden="true"></i></a></td>
             </tr>
