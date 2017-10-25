@@ -23,9 +23,9 @@ class CustomerForm(forms.ModelForm):
                                      .filter(reseller__isnull=False,
                                              is_active=True))
 
-    servers_limit = forms.IntegerField(initial=1, label="Servers limit", min_value=1)
+    servers_limit = forms.IntegerField(initial=0, label="Servers limit", min_value=0)
 
-    base_credits = forms.IntegerField(initial=1, label="Base Credits", min_value=1)
+    base_credits = forms.IntegerField(initial=0, label="Base Credits", min_value=0)
 
     def save(self):
         m = super(CustomerForm, self).save(commit=False)
@@ -38,7 +38,7 @@ class CustomerForm(forms.ModelForm):
         Profile.objects.create(user=m, account_type=0)
         return m
 
-    def __init__(self, reseller, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(CustomerForm, self).__init__(*args, **kwargs)
         if reseller:
             del self.fields['reseller']
@@ -56,7 +56,7 @@ class ResellerForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
     servers_limit = forms.IntegerField(initial=0, label="Servers limit")
     customers_limit = forms.IntegerField(initial=0, label="Customers limit")
-    base_credits = forms.IntegerField(initial=1, label="Base Credits", min_value=1)
+    base_credits = forms.IntegerField(initial=0, label="Base Credits", min_value=0)
 
     def save(self):
         m = super(ResellerForm, self).save(commit=False)

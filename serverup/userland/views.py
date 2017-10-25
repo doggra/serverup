@@ -171,17 +171,16 @@ class CustomerListView(ListView):
 
 
 @method_decorator(login_required, name='dispatch')
-class CustomerEditView(FormView):
-    form_class = CustomerForm
+class CustomerEditView(TemplateView):
     template_name = 'userland/customer_edit.html'
     success_url = reverse_lazy('customer_list')
 
     def post(self, request, uuid):
         user = self.get_object()
         if request.user.profile.account_type == 2:
-            form = CustomerForm(False, request.POST, instance=user)
+            form = CustomerForm(request.POST, instance=user, reseller_form=True)
         else:
-            form = CustomerForm(True, request.POST, instance=user)
+            form = CustomerForm(request.POST, instance=user, reseller_form=False)
         form.fields['password'].required = False
 
         if form.is_valid():
